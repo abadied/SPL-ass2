@@ -1,5 +1,7 @@
 package bgu.spl.a2;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 /**
  * this class represents a deferred result i.e., an object that eventually will
  * be resolved to hold a result of some operation, the class allows for getting
@@ -17,6 +19,13 @@ package bgu.spl.a2;
  */
 public class Deferred<T> {
 
+	private AtomicBoolean resolved;
+	private T value;
+	
+	public Deferred(){
+		resolved = new AtomicBoolean(false);
+	}
+	
 	/**
 	 *
 	 * @return the resolved value if such exists (i.e., if this object has been
@@ -25,7 +34,10 @@ public class Deferred<T> {
 	 *             in the case where this method is called and this object is
 	 *             not yet resolved
 	 */
-	public T get() {
+	public T get() throws IllegalStateException {
+		if (!isResolved())
+			throw new IllegalStateException();
+		
 		// TODO: replace method body with real implementation
 		throw new UnsupportedOperationException("Not Implemented Yet.");
 	}
@@ -37,8 +49,7 @@ public class Deferred<T> {
 	 *         before.
 	 */
 	public boolean isResolved() {
-		// TODO: replace method body with real implementation
-		throw new UnsupportedOperationException("Not Implemented Yet.");
+		return resolved.get();
 	}
 
 	/**
@@ -54,7 +65,10 @@ public class Deferred<T> {
 	 * @throws IllegalStateException
 	 *             in the case where this object is already resolved
 	 */
-	public void resolve(T value) {
+	public void resolve(T value) throws IllegalStateException {
+		if (resolved.getAndSet(true))
+			throw new IllegalStateException();
+		
 		// TODO: replace method body with real implementation
 		throw new UnsupportedOperationException("Not Implemented Yet.");
 	}
@@ -73,8 +87,12 @@ public class Deferred<T> {
 	 *            the callback to be called when the deferred object is resolved
 	 */
 	public void whenResolved(Runnable callback) {
+		
+		// TODO: save callback
+		// TODO: if resolved run callback and turn to null
+		// TODO: if not resolved do nothing AND CALL WHENRESOLVED AT THE END OF RESOLVE
+		
 		// TODO: replace method body with real implementation
 		throw new UnsupportedOperationException("Not Implemented Yet.");
 	}
-
 }

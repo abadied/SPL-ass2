@@ -8,8 +8,13 @@ import org.junit.Test;
 
 public class DeferredTest {
 
+	Deferred<Integer> def;
+	boolean res;
+	
 	@Before
 	public void setUp() throws Exception {
+		def = new Deferred<>();
+		res = false;
 	}
 
 	@After
@@ -18,22 +23,64 @@ public class DeferredTest {
 
 	@Test
 	public void testGet() {
-		fail("Not yet implemented");
+		// before resolve
+		boolean gotException = false;
+		try {
+			def.get();
+		}
+		catch (IllegalStateException e){
+			gotException = true;
+		}
+		assertTrue(gotException);
+		
+		// after resolve
+		def.resolve(5);
+		assertEquals(5, def.get().intValue());
 	}
 
 	@Test
 	public void testIsResolved() {
-		fail("Not yet implemented");
+		assertTrue(!def.isResolved());
+		def.resolve(5);
+		assertTrue(def.isResolved());
 	}
 
 	@Test
 	public void testResolve() {
-		fail("Not yet implemented");
+		// resolve once
+		def.resolve(3);
+		assertEquals(3, def.get().intValue());
+		
+		// resolve twice
+		boolean secondResolveFail = false;
+		try {
+			def.resolve(5);
+		}
+		catch (IllegalStateException e){
+			secondResolveFail = true;
+		}
+		
+		assertTrue(secondResolveFail);
+		
+		assertEquals(3, def.get().intValue());
 	}
 
 	@Test
 	public void testWhenResolved() {
-		fail("Not yet implemented");
+		// test for whenResolved before resolve
+		def.whenResolved(() -> {
+			res = true;
+		});
+		
+		def.resolve(6);
+		assertTrue(res);
+		
+		// test for whenResolved after resolve
+		res = false;
+		def.whenResolved(() -> {
+			res = true;
+		});
+		assertTrue(res);
 	}
 
 }
