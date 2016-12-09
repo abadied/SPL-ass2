@@ -13,34 +13,35 @@ package bgu.spl.a2;
  */
 public class Processor implements Runnable {
 
-    private final WorkStealingThreadPool pool;
-    private final int id;
+	private final WorkStealingThreadPool pool;
+	private final int id;
 
-    /**
-     * constructor for this class
-     *
-     * IMPORTANT:
-     * 1) this method is package protected, i.e., only classes inside
-     * the same package can access it - you should *not* change it to
-     * public/private/protected
-     *
-     * 2) you may not add other constructors to this class
-     * nor you allowed to add any other parameter to this constructor - changing
-     * this may cause automatic tests to fail..
-     *
-     * @param id - the processor id (every processor need to have its own unique
-     * id inside its thread pool)
-     * @param pool - the thread pool which owns this processor
-     */
-    /*package*/ Processor(int id, WorkStealingThreadPool pool) {
-        this.id = id;
-        this.pool = pool;
-    }
+	/**
+	 * constructor for this class
+	 *
+	 * IMPORTANT: 1) this method is package protected, i.e., only classes inside
+	 * the same package can access it - you should *not* change it to
+	 * public/private/protected
+	 *
+	 * 2) you may not add other constructors to this class nor you allowed to
+	 * add any other parameter to this constructor - changing this may cause
+	 * automatic tests to fail..
+	 *
+	 * @param id
+	 *            - the processor id (every processor need to have its own
+	 *            unique id inside its thread pool)
+	 * @param pool
+	 *            - the thread pool which owns this processor
+	 */
+	/* package */ Processor(int id, WorkStealingThreadPool pool) {
+		this.id = id;
+		this.pool = pool;
+	}
 
-    @Override
-    public void run() {
-        //TODO: replace method body with real implementation
-        throw new UnsupportedOperationException("Not Implemented Yet.");
-    }
+	@Override
+	public void run() {
+		// TODO: replace method body with real implementation
+		throw new UnsupportedOperationException("Not Implemented Yet.");
+	}
 
 }
