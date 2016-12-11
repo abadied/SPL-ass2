@@ -22,64 +22,53 @@ public class DeferredTest {
 	}
 
 	@Test
-	public void testGet() {
-		// before resolve
-		boolean gotException = false;
-		try {
-			def.get();
-		}
-		catch (IllegalStateException e){
-			gotException = true;
-		}
-		assertTrue(gotException);
-		
-		// after resolve
+	public void testResolve() {
 		def.resolve(5);
-		assertEquals(5, def.get().intValue());
+		assertEquals("Expected value of 5", 5, def.get().intValue());
+	}
+	
+	@Test(expected = IllegalStateException.class)
+	public void testResolveWhenCalledAfterResolve() {
+		def.resolve(5);
+		def.resolve(6);
+	}
+	
+	@Test(expected = IllegalStateException.class)
+	public void testGetBeforeResolve() throws IllegalStateException{
+		def.get();
 	}
 
 	@Test
-	public void testIsResolved() {
+	public void testIsResolvedBeforeResolve() {
 		assertTrue(!def.isResolved());
+	}
+	
+	@Test
+	public void testIsResolvedAfterResolve() {
 		def.resolve(5);
 		assertTrue(def.isResolved());
 	}
 
 	@Test
-	public void testResolve() {
-		// resolve once
-		def.resolve(3);
-		assertEquals(3, def.get().intValue());
-		
-		// resolve twice
-		boolean secondResolveFail = false;
-		try {
-			def.resolve(5);
-		}
-		catch (IllegalStateException e){
-			secondResolveFail = true;
-		}
-		
-		assertTrue(secondResolveFail);
-		
-		assertEquals(3, def.get().intValue());
-	}
-
-	@Test
-	public void testWhenResolved() {
-		// test for whenResolved before resolve
+	public void testWhenResolvedBeforeResolve() {
 		def.whenResolved(() -> {
 			res = true;
 		});
 		
-		def.resolve(6);
+		def.resolve(5);
 		assertTrue(res);
+	}
+	
+	@Test
+	public void testWhenResolvedAfterResolve() {
+		// test for whenResolved before resolve
+		def.resolve(5);
 		
-		// test for whenResolved after resolve
 		res = false;
 		def.whenResolved(() -> {
 			res = true;
 		});
+		
 		assertTrue(res);
 	}
 
