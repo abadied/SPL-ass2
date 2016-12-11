@@ -26,6 +26,23 @@ public class VersionMonitorTest {
 	@Test
 	public void testGetVersion() {
 		assertEquals(0, vm.getVersion());
+		Runnable rn = () -> {
+			for (int i = 0; i < 10; i++){
+				vm.inc();
+			}
+		};
+		for (int i = 0; i < 10; i++)
+			tArr[i] = new Thread(rn);
+		try {
+			for (Thread t : tArr)
+				t.start();
+			for (Thread t : tArr)
+				t.join();
+		}catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		assertEquals(100, vm.getVersion());
 	}
 
 	@Test
