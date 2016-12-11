@@ -9,13 +9,10 @@ import org.junit.Test;
 public class VersionMonitorTest {
 
 	VersionMonitor vm;
-	Thread t1;
-	Thread[] tArr;
 	
 	@Before
 	public void setUp() throws Exception {
 		vm = new VersionMonitor();
-		tArr = new Thread[10];
 	}
 
 	@After
@@ -26,83 +23,29 @@ public class VersionMonitorTest {
 	@Test
 	public void testGetVersion() {
 		assertEquals(0, vm.getVersion());
-		Runnable rn = () -> {
-			for (int i = 0; i < 10; i++){
-				vm.inc();
-			}
-		};
-		for (int i = 0; i < 10; i++)
-			tArr[i] = new Thread(rn);
-		try {
-			for (Thread t : tArr)
-				t.start();
-			for (Thread t : tArr)
-				t.join();
-		}catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		assertEquals(100, vm.getVersion());
 	}
 
 	@Test
 	public void testInc() {
 		vm.inc();
 		assertEquals(1, vm.getVersion());
-		Runnable rn = () -> {
-			for (int i = 0; i < 10; i++){
-				vm.inc();
-			}
-		};
-		for (int i = 0; i < 10; i++)
-			tArr[i] = new Thread(rn);
-		try {
-			for (Thread t : tArr)
-				t.start();
-			for (Thread t : tArr)
-				t.join();
-		}catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		assertEquals(101, vm.getVersion());
 	}
 
 	@Test
-	public void testAwait() {
-		Runnable rn = () -> {
-				for (int i = 0; i < 10; i++){
-					vm.inc();
-				}
-			};
-		t1 = new Thread(() -> {
+	public void testAwait() throws InterruptedException {
+
+		Thread t1 = new Thread(() -> {
 				try {
-					vm.await(100);
+					vm.await(0);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			});
 		
-		for (int i = 0; i < 10; i++)
-			tArr[i] = new Thread(rn);
-		
-		try {
-			t1.start();
-			
-			for (Thread t : tArr)
-				t.start();
-			
-			for (Thread t : tArr)
-				t.join();
-			t1.join();
-			
-			assertEquals(100, vm.getVersion());
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
+		t1.start();
+		vm.inc();
+		t1.join();
 	}
 
 }

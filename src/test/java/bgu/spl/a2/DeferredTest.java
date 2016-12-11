@@ -28,13 +28,13 @@ public class DeferredTest {
 	}
 	
 	@Test(expected = IllegalStateException.class)
-	public void testResolveWhenCalledAfterResolve() {
+	public void testResolveWhenCalledAfterResolve() throws IllegalStateException {
 		def.resolve(5);
 		def.resolve(6);
 	}
 	
 	@Test(expected = IllegalStateException.class)
-	public void testGetBeforeResolve() throws IllegalStateException{
+	public void testGetBeforeResolve() throws IllegalStateException {
 		def.get();
 	}
 
@@ -61,7 +61,6 @@ public class DeferredTest {
 	
 	@Test
 	public void testWhenResolvedAfterResolve() {
-		// test for whenResolved before resolve
 		def.resolve(5);
 		
 		res = false;
