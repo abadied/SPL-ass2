@@ -10,20 +10,31 @@ public class ManufactoringPlan {
 	* @param parts - array of strings describing the plans part names
 	* @param tools - array of strings describing the plans tools names
 	*/
-    public ManufactoringPlan(String product, String[] parts, String[] tools);
+    public ManufactoringPlan(String product, String[] parts, String[] tools){
+    	//TODO
+    }
 
 	/**
 	* @return array of strings describing the plans part names
 	*/
-    public String[] getParts();
+    public String[] getParts(){
+    	//TODO
+    	return null;//change
+    }
 
 	/**
 	* @return string containing product name
 	*/
-    public String getProductName();
+    public String getProductName(){
+    	//TODO
+    	return null;//change
+    }
 	/**
 	* @return array of strings describing the plans tools names
 	*/
-    public String[] getTools();
+    public String[] getTools(){
+    	//TODO
+    	return null;//change
+    }
 
 }

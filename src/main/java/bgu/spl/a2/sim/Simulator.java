@@ -16,11 +16,15 @@ public class Simulator {
 	* Begin the simulation
 	* Should not be called before attachWorkStealingThreadPool()
 	*/
-    public static void start();
+    public static void start(){
+    	//TODO
+    }
 	
 	/**
 	* attach a WorkStealingThreadPool to the Simulator, this WorkStealingThreadPool will be used to run the simulation
 	* @param myWorkStealingThreadPool - the WorkStealingThreadPool which will be used by the simulator
 	*/
-	public static void attachWorkStealingThreadPool(WorkStealingThreadPool myWorkStealingThreadPool);
+	public static void attachWorkStealingThreadPool(WorkStealingThreadPool myWorkStealingThreadPool){
+		//TODO
+	}
 }

@@ -18,7 +18,9 @@ public class Warehouse {
 	/**
 	* Constructor
 	*/
-    public Warehouse();
+    public Warehouse(){
+    	//TODO
+    }
 
 	/**
 	* Tool acquisition procedure
@@ -26,13 +28,18 @@ public class Warehouse {
 	* @param type - string describing the required tool
 	* @return a deferred promise for the  requested tool
 	*/
-    public Deferred<Tool> acquireTool(String type);
+    public Deferred<Tool> acquireTool(String type){
+    	//TODO
+    	return null;//change
+    }
 
 	/**
 	* Tool return procedure - releases a tool which becomes available in the warehouse upon completion.
 	* @param tool - The tool to be returned
 	*/
-    public void releaseTool(Tool tool);
+    public void releaseTool(Tool tool){
+    	//TODO
+    }
 
 	
 	/**
@@ -40,19 +47,27 @@ public class Warehouse {
 	* @param product - a string with the product name for which a ManufactoringPlan is desired
 	* @return A ManufactoringPlan for product
 	*/
-    public ManufactoringPlan getPlan(String product);
+    public ManufactoringPlan getPlan(String product){
+    	//TODO
+    	return null;//change
+    }
 	
 	/**
 	* Store a ManufactoringPlan in the warehouse for later retrieval
 	* @param plan - a ManufactoringPlan to be stored
 	*/
-    public void addPlan(ManufactoringPlan plan);
+    public void addPlan(ManufactoringPlan plan){
+    	//TODO
+    	
+    }
     
 	/**
 	* Store a qty Amount of tools of type tool in the warehouse for later retrieval
 	* @param tool - type of tool to be stored
 	* @param qty - amount of tools of type tool to be stored
 	*/
-    public void addTool(Tool tool, int qty);
+    public void addTool(Tool tool, int qty){
+    	//TODO
+    }
 
 }
