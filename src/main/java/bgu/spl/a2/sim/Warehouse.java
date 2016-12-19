@@ -16,58 +16,71 @@ import bgu.spl.a2.Deferred;
 public class Warehouse {
 
 	/**
-	* Constructor
-	*/
-    public Warehouse(){
-    	//TODO
-    }
+	 * Constructor
+	 */
+	public Warehouse() {
+		// TODO
+	}
 
 	/**
-	* Tool acquisition procedure
-	* Note that this procedure is non-blocking and should return immediatly
-	* @param type - string describing the required tool
-	* @return a deferred promise for the  requested tool
-	*/
-    public Deferred<Tool> acquireTool(String type){
-    	//TODO
-    	return null;//change
-    }
+	 * Tool acquisition procedure Note that this procedure is non-blocking and
+	 * should return immediatly
+	 * 
+	 * @param type
+	 *            - string describing the required tool
+	 * @return a deferred promise for the requested tool
+	 */
+	public Deferred<Tool> acquireTool(String type) {
+		// TODO
+		return null;// change
+	}
 
 	/**
-	* Tool return procedure - releases a tool which becomes available in the warehouse upon completion.
-	* @param tool - The tool to be returned
-	*/
-    public void releaseTool(Tool tool){
-    	//TODO
-    }
+	 * Tool return procedure - releases a tool which becomes available in the
+	 * warehouse upon completion.
+	 * 
+	 * @param tool
+	 *            - The tool to be returned
+	 */
+	public void releaseTool(Tool tool) {
+		// TODO
+	}
 
-	
 	/**
-	* Getter for ManufactoringPlans
-	* @param product - a string with the product name for which a ManufactoringPlan is desired
-	* @return A ManufactoringPlan for product
-	*/
-    public ManufactoringPlan getPlan(String product){
-    	//TODO
-    	return null;//change
-    }
-	
+	 * Getter for ManufactoringPlans
+	 * 
+	 * @param product
+	 *            - a string with the product name for which a ManufactoringPlan
+	 *            is desired
+	 * @return A ManufactoringPlan for product
+	 */
+	public ManufactoringPlan getPlan(String product) {
+		// TODO
+		return null;// change
+	}
+
 	/**
-	* Store a ManufactoringPlan in the warehouse for later retrieval
-	* @param plan - a ManufactoringPlan to be stored
-	*/
-    public void addPlan(ManufactoringPlan plan){
-    	//TODO
-    	
-    }
-    
+	 * Store a ManufactoringPlan in the warehouse for later retrieval
+	 * 
+	 * @param plan
+	 *            - a ManufactoringPlan to be stored
+	 */
+	public void addPlan(ManufactoringPlan plan) {
+		// TODO
+
+	}
+
 	/**
-	* Store a qty Amount of tools of type tool in the warehouse for later retrieval
-	* @param tool - type of tool to be stored
-	* @param qty - amount of tools of type tool to be stored
-	*/
-    public void addTool(Tool tool, int qty){
-    	//TODO
-    }
+	 * Store a qty Amount of tools of type tool in the warehouse for later
+	 * retrieval
+	 * 
+	 * @param tool
+	 *            - type of tool to be stored
+	 * @param qty
+	 *            - amount of tools of type tool to be stored
+	 */
+	public void addTool(Tool tool, int qty) {
+		// TODO
+	}
 
 }

@@ -21,9 +21,11 @@ public class Deferred<T> {
 
 	private AtomicBoolean resolved;
 	private T value;
+	private Runnable callback;
 	
 	public Deferred(){
 		resolved = new AtomicBoolean(false);
+		callback = null;
 	}
 	
 	/**
@@ -38,8 +40,7 @@ public class Deferred<T> {
 		if (!isResolved())
 			throw new IllegalStateException();
 		
-		// TODO: replace method body with real implementation
-		throw new UnsupportedOperationException("Not Implemented Yet.");
+		return value;
 	}
 
 	/**
@@ -69,8 +70,9 @@ public class Deferred<T> {
 		if (resolved.getAndSet(true))
 			throw new IllegalStateException();
 		
-		// TODO: replace method body with real implementation
-		throw new UnsupportedOperationException("Not Implemented Yet.");
+		this.value = value;
+		
+		runCallback();
 	}
 
 	/**
@@ -87,12 +89,15 @@ public class Deferred<T> {
 	 *            the callback to be called when the deferred object is resolved
 	 */
 	public void whenResolved(Runnable callback) {
+		this.callback = callback;
 		
-		// TODO: save callback
-		// TODO: if resolved run callback and turn to null
-		// TODO: if not resolved do nothing AND CALL WHENRESOLVED AT THE END OF RESOLVE
-		
-		// TODO: replace method body with real implementation
-		throw new UnsupportedOperationException("Not Implemented Yet.");
+		runCallback();
+	}
+	
+	synchronized private void runCallback() {
+		if (callback != null && isResolved()){
+			callback.run();
+			callback = null;
+		}
 	}
 }

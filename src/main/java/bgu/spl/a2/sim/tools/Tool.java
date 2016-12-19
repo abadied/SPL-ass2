@@ -7,12 +7,16 @@ import bgu.spl.a2.sim.Product;
  */
 public interface Tool {
 	/**
-	* @return tool name as string
-	*/
-    public String getType();
-	/** Tool use method
-	* @param p - Product to use tool on
-	* @return a long describing the result of tool use on Product package
-	*/
-    public abstract long useOn(Product p);
+	 * @return tool name as string
+	 */
+	public String getType();
+
+	/**
+	 * Tool use method
+	 * 
+	 * @param p
+	 *            - Product to use tool on
+	 * @return a long describing the result of tool use on Product package
+	 */
+	public abstract long useOn(Product p);
 }
