@@ -27,6 +27,10 @@ public class WorkStealingThreadPool {
 	 */
 	public WorkStealingThreadPool(int nthreads) {
 		// TODO: replace method body with real implementation
+		
+		// create arraylist of processors
+		// create arraylist of queues
+		
 		throw new UnsupportedOperationException("Not Implemented Yet.");
 	}
 
@@ -38,6 +42,9 @@ public class WorkStealingThreadPool {
 	 */
 	public void submit(Task<?> task) {
 		// TODO: replace method body with real implementation
+		
+		// send task to one of the processors
+		
 		throw new UnsupportedOperationException("Not Implemented Yet.");
 	}
 
@@ -56,6 +63,9 @@ public class WorkStealingThreadPool {
 	 */
 	public void shutdown() throws InterruptedException {
 		// TODO: replace method body with real implementation
+		
+		// call shutdown on each processor
+		
 		throw new UnsupportedOperationException("Not Implemented Yet.");
 	}
 
@@ -64,6 +74,9 @@ public class WorkStealingThreadPool {
 	 */
 	public void start() {
 		// TODO: replace method body with real implementation
+		
+		// call start on each thread of processors
+		
 		throw new UnsupportedOperationException("Not Implemented Yet.");
 	}
 

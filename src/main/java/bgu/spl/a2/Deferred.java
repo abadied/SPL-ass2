@@ -1,6 +1,6 @@
 package bgu.spl.a2;
 
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * this class represents a deferred result i.e., an object that eventually will
@@ -19,12 +19,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class Deferred<T> {
 
-	private AtomicBoolean resolved;
-	private T value;
+	private AtomicReference<T>  value;
 	private Runnable callback;
 	
 	public Deferred(){
-		resolved = new AtomicBoolean(false);
+		value = new AtomicReference<T>(null);
 		callback = null;
 	}
 	
@@ -40,7 +39,7 @@ public class Deferred<T> {
 		if (!isResolved())
 			throw new IllegalStateException();
 		
-		return value;
+		return value.get();
 	}
 
 	/**
@@ -50,7 +49,7 @@ public class Deferred<T> {
 	 *         before.
 	 */
 	public boolean isResolved() {
-		return resolved.get();
+		return value.get() != null;
 	}
 
 	/**
@@ -67,10 +66,8 @@ public class Deferred<T> {
 	 *             in the case where this object is already resolved
 	 */
 	public void resolve(T value) throws IllegalStateException {
-		if (resolved.getAndSet(true))
+		if (!this.value.compareAndSet(null, value))
 			throw new IllegalStateException();
-		
-		this.value = value;
 		
 		runCallback();
 	}
@@ -94,8 +91,8 @@ public class Deferred<T> {
 		runCallback();
 	}
 	
-	synchronized private void runCallback() {
-		if (callback != null && isResolved()){
+	private synchronized void runCallback() {
+		if (isResolved() && callback != null){
 			callback.run();
 			callback = null;
 		}

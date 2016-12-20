@@ -41,6 +41,11 @@ public class Processor implements Runnable {
 	@Override
 	public void run() {
 		// TODO: replace method body with real implementation
+		
+		// while !shutdown
+			// get new task
+			// run task
+		
 		throw new UnsupportedOperationException("Not Implemented Yet.");
 	}
 
