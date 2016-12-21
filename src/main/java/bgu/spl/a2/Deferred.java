@@ -20,11 +20,11 @@ import java.util.concurrent.atomic.AtomicReference;
 public class Deferred<T> {
 
 	private AtomicReference<T>  value;
-	private Runnable callback;
+	private AtomicReference<Runnable> callback;
 	
 	public Deferred(){
 		value = new AtomicReference<T>(null);
-		callback = null;
+		callback = new AtomicReference<Runnable>(null);
 	}
 	
 	/**
@@ -69,7 +69,7 @@ public class Deferred<T> {
 		if (!this.value.compareAndSet(null, value))
 			throw new IllegalStateException();
 		
-		runCallback();
+		runCallback(); // try to run the callback if it wasn't already ran
 	}
 
 	/**
@@ -86,15 +86,18 @@ public class Deferred<T> {
 	 *            the callback to be called when the deferred object is resolved
 	 */
 	public void whenResolved(Runnable callback) {
-		this.callback = callback;
+		this.callback.set(callback);
 		
-		runCallback();
+		runCallback(); // try to run the callback in case this object was already resolved
 	}
 	
-	private synchronized void runCallback() {
-		if (isResolved() && callback != null){
-			callback.run();
-			callback = null;
+	// This function runs the callback only after resolve
+	private void runCallback() {
+		if (isResolved()){
+			Runnable cb = callback.getAndSet(null); // copying the callback and removing it from object atomically to avoid being called twice
+			
+			if (cb != null)
+				cb.run();
 		}
 	}
 }
