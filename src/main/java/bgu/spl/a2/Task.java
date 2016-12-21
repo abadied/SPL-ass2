@@ -16,6 +16,8 @@ import java.util.Collection;
  */
 public abstract class Task<R> {
 
+	Processor currentHandler;
+	
 	/**
 	 * start handling the task - note that this method is protected, a handler
 	 * cannot call it directly but instead must use the
@@ -40,7 +42,9 @@ public abstract class Task<R> {
 	 *            the handler that wants to handle the task
 	 */
 	/* package */ final void handle(Processor handler) {
-		// TODO: replace method body with real implementation
+		
+		currentHandler = handler;
+		
 		throw new UnsupportedOperationException("Not Implemented Yet.");
 	}
 
@@ -52,8 +56,7 @@ public abstract class Task<R> {
 	 *            the task to execute
 	 */
 	protected final void spawn(Task<?>... task) {
-		// TODO: replace method body with real implementation
-		throw new UnsupportedOperationException("Not Implemented Yet.");
+		currentHandler.addChildTasks(task);
 	}
 
 	/**

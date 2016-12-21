@@ -28,8 +28,8 @@ public class WorkStealingThreadPool {
 	public WorkStealingThreadPool(int nthreads) {
 		// TODO: replace method body with real implementation
 		
-		// create arraylist of processors
-		// create arraylist of queues
+		// create array of processors
+		// create array of queues
 		
 		throw new UnsupportedOperationException("Not Implemented Yet.");
 	}
@@ -41,11 +41,10 @@ public class WorkStealingThreadPool {
 	 *            the task to execute
 	 */
 	public void submit(Task<?> task) {
-		// TODO: replace method body with real implementation
 		
-		// send task to one of the processors
+		int id = 0; // TODO: check in assignment what ID needs to be selected
 		
-		throw new UnsupportedOperationException("Not Implemented Yet.");
+		addTasksToProccessor(id, task);
 	}
 
 	/**
@@ -62,9 +61,8 @@ public class WorkStealingThreadPool {
 	 *             processor of this queue
 	 */
 	public void shutdown() throws InterruptedException {
-		// TODO: replace method body with real implementation
 		
-		// call shutdown on each processor
+		// TODO: call shutdown on each processor
 		
 		throw new UnsupportedOperationException("Not Implemented Yet.");
 	}
@@ -73,11 +71,27 @@ public class WorkStealingThreadPool {
 	 * start the threads belongs to this thread pool
 	 */
 	public void start() {
-		// TODO: replace method body with real implementation
 		
-		// call start on each thread of processors
+		// TODO: call start on each thread of processors
 		
 		throw new UnsupportedOperationException("Not Implemented Yet.");
 	}
 
+	
+	/* package */ Task<?> giveTask(int id) {
+		
+		// TODO: if queue is empty, steal
+		// TODO: return task from queue
+		
+		throw new UnsupportedOperationException("Not Implemented Yet.");
+	}
+	
+	// adds any number of tasks to processor's queue by ID
+	/* package */ void addTasksToProccessor(int id, Task<?>... tasks) {
+		for (Task<?> task : tasks) {
+			// TODO: add task to queue by id
+		}
+		
+		throw new UnsupportedOperationException("Not Implemented Yet.");
+	}
 }

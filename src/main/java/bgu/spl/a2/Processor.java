@@ -16,7 +16,7 @@ public class Processor implements Runnable {
 	private final WorkStealingThreadPool pool;
 	private final int id;
 	
-	private boolean shutdown;
+	boolean shutdown;
 
 	/**
 	 * constructor for this class
@@ -44,17 +44,18 @@ public class Processor implements Runnable {
 
 	@Override
 	public void run() {
-		// TODO: replace method body with real implementation
-		
-		while (!shutdown){
-			// get new task
-			// run task
+		while (!shutdown) {
+			Task<?> task = pool.giveTask(id);
+			task.handle(this);
 		}
-		
-		throw new UnsupportedOperationException("Not Implemented Yet.");
 	}
-
-	public void shutdown(){
+	
+	// signals the processor that it needs to stop working
+	/* package */ void shutdown() {
 		shutdown = true;
+	}
+	
+	/* package */ void addChildTasks(Task<?>... tasks) {
+		pool.addTasksToProccessor(id, tasks);
 	}
 }
