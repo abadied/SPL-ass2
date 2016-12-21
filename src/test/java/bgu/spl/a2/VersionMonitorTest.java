@@ -38,7 +38,6 @@ public class VersionMonitorTest {
 				try {
 					vm.await(0);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			});

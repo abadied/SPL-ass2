@@ -17,6 +17,7 @@ import java.util.Collection;
 public abstract class Task<R> {
 
 	Processor currentHandler;
+	Deferred<R> deferred;
 	
 	/**
 	 * start handling the task - note that this method is protected, a handler
@@ -45,6 +46,9 @@ public abstract class Task<R> {
 		
 		currentHandler = handler;
 		
+		// TODO: first time called = call start
+		// TODO: check on assignment what to do otherwise
+		
 		throw new UnsupportedOperationException("Not Implemented Yet.");
 	}
 
@@ -71,7 +75,10 @@ public abstract class Task<R> {
 	 *            the callback to execute once all the results are resolved
 	 */
 	protected final void whenResolved(Collection<? extends Task<?>> tasks, Runnable callback) {
-		// TODO: replace method body with real implementation
+		
+		// TODO: run callback once all tasks in collection are resolved
+
+		
 		throw new UnsupportedOperationException("Not Implemented Yet.");
 	}
 
@@ -83,7 +90,9 @@ public abstract class Task<R> {
 	 *            - the task calculated result
 	 */
 	protected final void complete(R result) {
-		// TODO: replace method body with real implementation
+		
+		// TODO: resolve the deferred with the result
+		
 		throw new UnsupportedOperationException("Not Implemented Yet.");
 	}
 
@@ -91,8 +100,10 @@ public abstract class Task<R> {
 	 * @return this task deferred result
 	 */
 	public final Deferred<R> getResult() {
-		// TODO: replace method body with real implementation
-		throw new UnsupportedOperationException("Not Implemented Yet.");
+		
+		// TODO: check if needs to do anything special,
+		
+		return deferred;
 	}
 
 }

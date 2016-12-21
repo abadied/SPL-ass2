@@ -26,10 +26,8 @@ public class WorkStealingThreadPool {
 	 *            pool
 	 */
 	public WorkStealingThreadPool(int nthreads) {
-		// TODO: replace method body with real implementation
 		
-		// create array of processors
-		// create array of queues
+		// TODO: create array of processors and queues
 		
 		throw new UnsupportedOperationException("Not Implemented Yet.");
 	}
