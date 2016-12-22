@@ -60,7 +60,7 @@ public abstract class Task<R> {
 	 *            the task to execute
 	 */
 	protected final void spawn(Task<?>... task) {
-		currentHandler.addChildTasks(task);
+		currentHandler.addTasks(task);
 	}
 
 	/**
@@ -77,7 +77,6 @@ public abstract class Task<R> {
 	protected final void whenResolved(Collection<? extends Task<?>> tasks, Runnable callback) {
 		
 		// TODO: run callback once all tasks in collection are resolved
-
 		
 		throw new UnsupportedOperationException("Not Implemented Yet.");
 	}
@@ -91,9 +90,9 @@ public abstract class Task<R> {
 	 */
 	protected final void complete(R result) {
 		
-		// TODO: resolve the deferred with the result
+		// TODO: check if something else needs to happen
 		
-		throw new UnsupportedOperationException("Not Implemented Yet.");
+		deferred.resolve(result);
 	}
 
 	/**

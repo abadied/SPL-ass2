@@ -40,7 +40,7 @@ public class WorkStealingThreadPool {
 	 */
 	public void submit(Task<?> task) {
 		
-		int id = 0; // TODO: check in assignment what ID needs to be selected
+		int id = 0; // TODO: change to random processor
 		
 		addTasksToProccessor(id, task);
 	}

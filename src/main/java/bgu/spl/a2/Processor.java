@@ -55,7 +55,7 @@ public class Processor implements Runnable {
 		shutdown = true;
 	}
 	
-	/* package */ void addChildTasks(Task<?>... tasks) {
+	/* package */ void addTasks(Task<?>... tasks) {
 		pool.addTasksToProccessor(id, tasks);
 	}
 }
