@@ -1,5 +1,9 @@
 package bgu.spl.a2;
 
+
+import java.util.LinkedList;
+import java.util.concurrent.LinkedBlockingDeque;
+
 /**
  * represents a work stealing thread pool - to understand what this class does
  * please refer to your assignment.
@@ -12,6 +16,10 @@ package bgu.spl.a2;
  */
 public class WorkStealingThreadPool {
 
+	Processor[] processors;
+	LinkedBlockingDeque<Task<?>>[] queues;
+	Thread[] threads;
+	
 	/**
 	 * creates a {@link WorkStealingThreadPool} which has nthreads
 	 * {@link Processor}s. Note, threads should not get started until calling to
@@ -25,11 +33,18 @@ public class WorkStealingThreadPool {
 	 *            the number of threads that should be started by this thread
 	 *            pool
 	 */
+	@SuppressWarnings("unchecked")
 	public WorkStealingThreadPool(int nthreads) {
 		
-		// TODO: create array of processors and queues
-		
-		throw new UnsupportedOperationException("Not Implemented Yet.");
+		processors = new Processor[nthreads];
+		queues = new LinkedBlockingDeque[nthreads];//fix warning
+		for(int i=0; i < nthreads; i++){
+			processors[i] = new Processor(i,this);
+			queues[i] = new LinkedBlockingDeque<>();
+			threads[i] = new Thread(processors[i]);
+			
+		}
+		//TODO: check!!!
 	}
 
 	/**
@@ -40,9 +55,9 @@ public class WorkStealingThreadPool {
 	 */
 	public void submit(Task<?> task) {
 		
-		int id = 0; // TODO: change to random processor
-		
+		int id = (int)(Math.random() * (processors.length + 1));
 		addTasksToProccessor(id, task);
+		//TODO:check!!!!
 	}
 
 	/**
@@ -60,9 +75,10 @@ public class WorkStealingThreadPool {
 	 */
 	public void shutdown() throws InterruptedException {
 		
-		// TODO: call shutdown on each processor
-		
-		throw new UnsupportedOperationException("Not Implemented Yet.");
+		for(Processor p: processors){
+			p.shutdown();
+		}
+		//TODO:check!!!
 	}
 
 	/**
@@ -71,6 +87,9 @@ public class WorkStealingThreadPool {
 	public void start() {
 		
 		// TODO: call start on each thread of processors
+		for(Thread t: threads){
+			t.start();
+		}
 		
 		throw new UnsupportedOperationException("Not Implemented Yet.");
 	}
@@ -87,9 +106,8 @@ public class WorkStealingThreadPool {
 	// adds any number of tasks to processor's queue by ID
 	/* package */ void addTasksToProccessor(int id, Task<?>... tasks) {
 		for (Task<?> task : tasks) {
-			// TODO: add task to queue by id
+			queues[id].add(task);
 		}
-		
-		throw new UnsupportedOperationException("Not Implemented Yet.");
+		//TODO::check!!
 	}
 }

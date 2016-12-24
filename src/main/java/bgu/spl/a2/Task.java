@@ -76,7 +76,15 @@ public abstract class Task<R> {
 	 */
 	protected final void whenResolved(Collection<? extends Task<?>> tasks, Runnable callback) {
 		
-		// TODO: run callback once all tasks in collection are resolved
+		// TODO: run callback once all tasks in collection are resolved->done
+		boolean resolved = true;
+		for(Task<?> t: tasks){
+			if(!t.deferred.isResolved())
+				resolved = false;
+		}
+		if(resolved)
+			callback.run();
+		//TODO: check !!!!!
 		
 		throw new UnsupportedOperationException("Not Implemented Yet.");
 	}

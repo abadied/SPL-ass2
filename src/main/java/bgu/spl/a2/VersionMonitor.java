@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class VersionMonitor {
 	
 	private AtomicInteger i = new AtomicInteger(0);
-	Thread t = null;
+	//Thread t = null;
 	
 	public int getVersion() {
 		return i.get();
@@ -29,12 +29,16 @@ public class VersionMonitor {
 
 	public void inc() {
 		i.incrementAndGet();
-		if (t != null)
-			t.notify();
+		notifyAll();
 	}
 
+	//changes made ,need to check
 	public void await(int version) throws InterruptedException {
-		t = Thread.currentThread();
-		Thread.currentThread().wait();
+		if(Thread.interrupted())
+			throw new InterruptedException();
+		//check if needed
+		int curr_ver = i.get();
+		while(curr_ver == i.get())
+			Thread.currentThread().wait();
 	}
 }
