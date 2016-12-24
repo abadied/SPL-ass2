@@ -1,6 +1,7 @@
 package bgu.spl.a2;
 
 import java.util.Collection;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * an abstract class that represents a task that may be executed using the
@@ -18,6 +19,9 @@ public abstract class Task<R> {
 
 	Processor currentHandler;
 	Deferred<R> deferred;
+	Runnable callback;
+	AtomicInteger childTasksLeft;
+	boolean started = false;
 	
 	/**
 	 * start handling the task - note that this method is protected, a handler
@@ -45,11 +49,12 @@ public abstract class Task<R> {
 	/* package */ final void handle(Processor handler) {
 		
 		currentHandler = handler;
+		if (!started)
+			start();
+		else
+			callback.run();
 		
-		// TODO: first time called = call start
-		// TODO: check on assignment what to do otherwise
-		
-		throw new UnsupportedOperationException("Not Implemented Yet.");
+		// TODO: test
 	}
 
 	/**
@@ -76,17 +81,24 @@ public abstract class Task<R> {
 	 */
 	protected final void whenResolved(Collection<? extends Task<?>> tasks, Runnable callback) {
 		
-		// TODO: run callback once all tasks in collection are resolved->done
-		boolean resolved = true;
-		for(Task<?> t: tasks){
-			if(!t.deferred.isResolved())
-				resolved = false;
-		}
-		if(resolved)
-			callback.run();
-		//TODO: check !!!!!
+		this.callback = callback;
+		this.childTasksLeft = new AtomicInteger(tasks.size());
+		for (Task<?> task : tasks)
+			task.getResult().whenResolved(() -> { reportResolve(); }); // when a child task is done, report to this task
 		
-		throw new UnsupportedOperationException("Not Implemented Yet.");
+		// TODO: test
+	}
+	
+	/**
+	 * When a child task resolves it's deferred result, it calls this method.
+	 * 
+	 * Once all child tasks are resolved, this task will be added back to the queue.
+	 */
+	protected final void reportResolve(){
+		if(childTasksLeft.decrementAndGet() == 0)
+			currentHandler.addTasks(this);
+		
+		// TODO: test
 	}
 
 	/**
@@ -97,9 +109,6 @@ public abstract class Task<R> {
 	 *            - the task calculated result
 	 */
 	protected final void complete(R result) {
-		
-		// TODO: check if something else needs to happen
-		
 		deferred.resolve(result);
 	}
 
@@ -107,9 +116,6 @@ public abstract class Task<R> {
 	 * @return this task deferred result
 	 */
 	public final Deferred<R> getResult() {
-		
-		// TODO: check if needs to do anything special,
-		
 		return deferred;
 	}
 

@@ -45,7 +45,7 @@ public class Processor implements Runnable {
 	@Override
 	public void run() {
 		while (!shutdown) {
-			Task<?> task = pool.giveTask(id);
+			Task<?> task = pool.fetch(id);
 			task.handle(this);
 		}
 	}

@@ -31,9 +31,11 @@ public class VersionMonitor {
 		i.incrementAndGet();
 		notifyAll();
 	}
-
-	//changes made ,need to check
+	
 	public void await(int version) throws InterruptedException {
+		
+		// TODO: test test test (Eden, I'm pretty sure that's not how this works)
+		
 		if(Thread.interrupted())
 			throw new InterruptedException();
 		//check if needed

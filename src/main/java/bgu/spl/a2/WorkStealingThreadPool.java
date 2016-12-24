@@ -1,7 +1,7 @@
 package bgu.spl.a2;
 
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.concurrent.LinkedBlockingDeque;
 
 /**
@@ -16,9 +16,9 @@ import java.util.concurrent.LinkedBlockingDeque;
  */
 public class WorkStealingThreadPool {
 
-	Processor[] processors;
-	LinkedBlockingDeque<Task<?>>[] queues;
-	Thread[] threads;
+	ArrayList<Processor> processors;
+	ArrayList<LinkedBlockingDeque<Task<?>>> queues;
+	ArrayList<Thread> threads;
 	
 	/**
 	 * creates a {@link WorkStealingThreadPool} which has nthreads
@@ -33,16 +33,14 @@ public class WorkStealingThreadPool {
 	 *            the number of threads that should be started by this thread
 	 *            pool
 	 */
-	@SuppressWarnings("unchecked")
 	public WorkStealingThreadPool(int nthreads) {
 		
-		processors = new Processor[nthreads];
-		queues = new LinkedBlockingDeque[nthreads];//fix warning
+		processors = new ArrayList<Processor>();
+		queues = new ArrayList<LinkedBlockingDeque<Task<?>>>();
 		for(int i=0; i < nthreads; i++){
-			processors[i] = new Processor(i,this);
-			queues[i] = new LinkedBlockingDeque<>();
-			threads[i] = new Thread(processors[i]);
-			
+			processors.add(new Processor(i,this));
+			queues.add(new LinkedBlockingDeque<Task<?>>());
+			threads.add(new Thread(processors.get(i)));
 		}
 		//TODO: check!!!
 	}
@@ -55,8 +53,9 @@ public class WorkStealingThreadPool {
 	 */
 	public void submit(Task<?> task) {
 		
-		int id = (int)(Math.random() * (processors.length + 1));
+		int id = (int)(Math.random() * (processors.size() - 1));
 		addTasksToProccessor(id, task);
+		
 		//TODO:check!!!!
 	}
 
@@ -75,10 +74,11 @@ public class WorkStealingThreadPool {
 	 */
 	public void shutdown() throws InterruptedException {
 		
+		// TODO: change to interrupt
+		
 		for(Processor p: processors){
 			p.shutdown();
 		}
-		//TODO:check!!!
 	}
 
 	/**
@@ -86,16 +86,14 @@ public class WorkStealingThreadPool {
 	 */
 	public void start() {
 		
-		// TODO: call start on each thread of processors
-		for(Thread t: threads){
-			t.start();
-		}
+		// TODO: test
 		
-		throw new UnsupportedOperationException("Not Implemented Yet.");
+		for(Thread t: threads)
+			t.start();
 	}
 
 	
-	/* package */ Task<?> giveTask(int id) {
+	/* package */ Task<?> fetch(int id) {
 		
 		// TODO: if queue is empty, steal
 		// TODO: return task from queue
@@ -106,7 +104,7 @@ public class WorkStealingThreadPool {
 	// adds any number of tasks to processor's queue by ID
 	/* package */ void addTasksToProccessor(int id, Task<?>... tasks) {
 		for (Task<?> task : tasks) {
-			queues[id].add(task);
+			queues.get(id).add(task);
 		}
 		//TODO::check!!
 	}
