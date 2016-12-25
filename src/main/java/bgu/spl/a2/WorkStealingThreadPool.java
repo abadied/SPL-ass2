@@ -103,7 +103,7 @@ public class WorkStealingThreadPool {
 			return steal(id);
 	}
 	
-	
+	//steal the cards from the other queues if there are any to steal
 	private Task<?> steal(int id){
 		//TODO:test
 		while(queues.get(id).isEmpty()){
