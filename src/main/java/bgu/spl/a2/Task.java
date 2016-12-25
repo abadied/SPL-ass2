@@ -47,14 +47,11 @@ public abstract class Task<R> {
 	 *            the handler that wants to handle the task
 	 */
 	/* package */ final void handle(Processor handler) {
-		
 		currentHandler = handler;
 		if (!started)
 			start();
 		else
 			callback.run();
-		
-		// TODO: test
 	}
 
 	/**
@@ -80,13 +77,10 @@ public abstract class Task<R> {
 	 *            the callback to execute once all the results are resolved
 	 */
 	protected final void whenResolved(Collection<? extends Task<?>> tasks, Runnable callback) {
-		
 		this.callback = callback;
 		this.childTasksLeft = new AtomicInteger(tasks.size());
 		for (Task<?> task : tasks)
 			task.getResult().whenResolved(() -> { reportResolve(); }); // when a child task is done, report to this task
-		
-		// TODO: test
 	}
 	
 	/**
@@ -97,8 +91,6 @@ public abstract class Task<R> {
 	protected final void reportResolve(){
 		if(childTasksLeft.decrementAndGet() == 0)
 			currentHandler.addTasks(this);
-		
-		// TODO: test
 	}
 
 	/**

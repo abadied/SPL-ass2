@@ -2,7 +2,7 @@ package bgu.spl.a2;
 
 
 import java.util.ArrayList;
-import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 /**
  * represents a work stealing thread pool - to understand what this class does
@@ -17,9 +17,10 @@ import java.util.concurrent.LinkedBlockingDeque;
 public class WorkStealingThreadPool {
 
 	ArrayList<Processor> processors;
-	ArrayList<LinkedBlockingDeque<Task<?>>> queues;
+	ArrayList<ConcurrentLinkedDeque<Task<?>>> queues;
 	ArrayList<Thread> threads;
-	VersionMonitor version;
+	VersionMonitor versionMonitor;
+	int nthreads;
 	
 	/**
 	 * creates a {@link WorkStealingThreadPool} which has nthreads
@@ -35,15 +36,15 @@ public class WorkStealingThreadPool {
 	 *            pool
 	 */
 	public WorkStealingThreadPool(int nthreads) {
-		
+		this.nthreads = nthreads;
 		processors = new ArrayList<Processor>();
-		queues = new ArrayList<LinkedBlockingDeque<Task<?>>>();
+		queues = new ArrayList<ConcurrentLinkedDeque<Task<?>>>();
+		
 		for(int i=0; i < nthreads; i++){
 			processors.add(new Processor(i,this));
-			queues.add(new LinkedBlockingDeque<Task<?>>());
+			queues.add(new ConcurrentLinkedDeque<Task<?>>());
 			threads.add(new Thread(processors.get(i)));
 		}
-		//TODO: check!!!
 	}
 
 	/**
@@ -53,12 +54,10 @@ public class WorkStealingThreadPool {
 	 *            the task to execute
 	 */
 	public void submit(Task<?> task) {
-		
 		int id = (int)(Math.random() * (processors.size() - 1));
-		addTasksToProccessor(id, task);
-		version.inc();
+		addTasksToProcessor(id, task);
 		
-		//TODO:check!!!!
+		versionMonitor.inc(); // informs all waiting processors that there's a new task in the pool
 	}
 
 	/**
@@ -75,8 +74,6 @@ public class WorkStealingThreadPool {
 	 *             processor of this queue
 	 */
 	public void shutdown() throws InterruptedException {
-		
-		// TODO: change to interrupt->Test
 		for(Thread t: threads)
 			t.interrupt();
 	}
@@ -85,54 +82,95 @@ public class WorkStealingThreadPool {
 	 * start the threads belongs to this thread pool
 	 */
 	public void start() {
-		
-		// TODO: test
-		
 		for(Thread t: threads)
 			t.start();
 	}
 
-	
-	/* package */ Task<?> fetch(int id){
-		//TODO:test
-		Task<?> t = queues.get(id).pollFirst();
-		if(t != null){
-			return t;
-		}
-		else
-			return steal(id);
-	}
-	
-	//steal the cards from the other queues if there are any to steal
-	private Task<?> steal(int id){
-		//TODO:test
-		while(queues.get(id).isEmpty()){
-			int tmp_ver = version.getVersion();
-			for(LinkedBlockingDeque<Task<?>> q: queues){
-				if(!q.isEmpty() && q != queues.get(id)){
-					for(int i = 0;i < (int)(q.size()/2) ; i++)
-						queues.get(id).add(q.pollFirst());
-					
-				}
+	/**
+	 * returns the next task in queue. If the queue is empty, will try to steal tasks from other queues
+	 * 
+	 * @param id the processor asking for next task
+	 * @return a task to be handled
+	 * @throws InterruptedException
+	 * 				if the thread was interrupted while waiting for a task
+	 */
+	/* package */ Task<?> fetch(int id) throws InterruptedException {
+		
+		Task<?> t = null;
+		int currVersion;
+		
+		while (t == null){
+			currVersion = versionMonitor.getVersion();
+			
+			t = queues.get(id).pollFirst();
+			if (t == null) // nothing in queue
+				t = stealAndFetch(id);
+			if (t == null) { // nothing to steal
+				versionMonitor.await(currVersion); // wait until the pool gets new Tasks
 			}
-			if(queues.get(id).isEmpty())
-				try{
-					version.await(tmp_ver);
-				}
-				catch (InterruptedException e){
-					//remove if not necessary 
-					System.err.println("InterruptedException: " + e.getMessage());//for testing!
-				}
 		}
-		return queues.get(id).pollFirst();
+		
+		return t;
+	}
+	
+	/**
+	 * try to steal tasks from other processors, stops after one successful heist
+	 * 
+	 * @param robberId the stealing processor
+	 * @return a task to be sent to the processor, null if nothing was stolen
+	 */
+	/* package */ Task<?> stealAndFetch(int robberId){
+		
+		Task<?> t = null;
+		
+		for (int i = robberId + 1; (i % nthreads) != robberId; i++) {
+			t = stealFromVictimAndFetch(robberId, i);
+			if (t != null)
+				break;
+		}
+		
+		return t;
+	}
+	
+	/**
+	 * this method tries to steal tasks from a specific victim and add it to the robber's queue
+	 * 
+	 * @param robberId the stealing processor
+	 * @param victimId the processor to try and steal from
+	 * @return a task to be sent to the processor, null if victim's queue is empty
+	 */
+	/* package */ Task<?> stealFromVictimAndFetch(int robberId, int victimId) {
+		ConcurrentLinkedDeque<Task<?>> victim = queues.get(victimId);
+		
+		int maxTasksToSteal = victim.size() / 2;
+		Task<?> t = victim.pollLast();
+		if (t == null)
+			return null;
+		
+		Task<?> nextTask = null;
+		
+		for(int i = 1; i < maxTasksToSteal; i++){
+			nextTask = victim.pollLast();
+			if (nextTask == null) // victim queue may get empty while trying to steal
+				break;
+			addTasksToProcessor(robberId, nextTask);
+		}
+		
+		return t;
+		
 	}
 	
 	
-	// adds any number of tasks to processor's queue by ID
-	/* package */ void addTasksToProccessor(int id, Task<?>... tasks) {
+	/**
+	 * 
+	 * Adds tasks to a specific processor's queue
+	 * 
+	 * @param id the target processor
+	 * @param tasks the tasks to be added
+	 */
+	/* package */ void addTasksToProcessor(int id, Task<?>... tasks) {
 		for (Task<?> task : tasks) {
 			queues.get(id).add(task);
 		}
-		//TODO::check!!
 	}
 }

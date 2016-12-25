@@ -44,18 +44,18 @@ public class Processor implements Runnable {
 
 	@Override
 	public void run() {
-		while (!shutdown) {
-			Task<?> task = pool.fetch(id);
-			task.handle(this);
+		while (!Thread.currentThread().isInterrupted()) {
+			try {
+				Task<?> task = pool.fetch(id);
+				task.handle(this);
+			}
+			catch (InterruptedException e){
+				Thread.currentThread().interrupt();
+			}
 		}
 	}
 	
-	// signals the processor that it needs to stop working
-	/* package */ void shutdown() {
-		shutdown = true;
-	}
-	
 	/* package */ void addTasks(Task<?>... tasks) {
-		pool.addTasksToProccessor(id, tasks);
+		pool.addTasksToProcessor(id, tasks);
 	}
 }
