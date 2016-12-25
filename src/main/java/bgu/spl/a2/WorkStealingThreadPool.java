@@ -19,6 +19,7 @@ public class WorkStealingThreadPool {
 	ArrayList<Processor> processors;
 	ArrayList<LinkedBlockingDeque<Task<?>>> queues;
 	ArrayList<Thread> threads;
+	VersionMonitor version;
 	
 	/**
 	 * creates a {@link WorkStealingThreadPool} which has nthreads
@@ -55,6 +56,7 @@ public class WorkStealingThreadPool {
 		
 		int id = (int)(Math.random() * (processors.size() - 1));
 		addTasksToProccessor(id, task);
+		version.inc();
 		
 		//TODO:check!!!!
 	}
@@ -74,11 +76,9 @@ public class WorkStealingThreadPool {
 	 */
 	public void shutdown() throws InterruptedException {
 		
-		// TODO: change to interrupt
-		
-		for(Processor p: processors){
-			p.shutdown();
-		}
+		// TODO: change to interrupt->Test
+		for(Thread t: threads)
+			t.interrupt();
 	}
 
 	/**
@@ -93,13 +93,40 @@ public class WorkStealingThreadPool {
 	}
 
 	
-	/* package */ Task<?> fetch(int id) {
-		
-		// TODO: if queue is empty, steal
-		// TODO: return task from queue
-		
-		throw new UnsupportedOperationException("Not Implemented Yet.");
+	/* package */ Task<?> fetch(int id){
+		//TODO:test
+		Task<?> t = queues.get(id).pollFirst();
+		if(t != null){
+			return t;
+		}
+		else
+			return steal(id);
 	}
+	
+	
+	private Task<?> steal(int id){
+		//TODO:test
+		while(queues.get(id).isEmpty()){
+			int tmp_ver = version.getVersion();
+			for(LinkedBlockingDeque<Task<?>> q: queues){
+				if(!q.isEmpty() && q != queues.get(id)){
+					for(int i = 0;i < (int)(q.size()/2) ; i++)
+						queues.get(id).add(q.pollFirst());
+					
+				}
+			}
+			if(queues.get(id).isEmpty())
+				try{
+					version.await(tmp_ver);
+				}
+				catch (InterruptedException e){
+					//remove if not necessary 
+					System.err.println("InterruptedException: " + e.getMessage());//for testing!
+				}
+		}
+		return queues.get(id).pollFirst();
+	}
+	
 	
 	// adds any number of tasks to processor's queue by ID
 	/* package */ void addTasksToProccessor(int id, Task<?>... tasks) {

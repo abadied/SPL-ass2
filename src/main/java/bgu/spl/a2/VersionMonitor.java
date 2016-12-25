@@ -34,11 +34,7 @@ public class VersionMonitor {
 	
 	public void await(int version) throws InterruptedException {
 		
-		// TODO: test test test (Eden, I'm pretty sure that's not how this works)
-		
-		if(Thread.interrupted())
-			throw new InterruptedException();
-		//check if needed
+		// TODO: test test test 
 		int curr_ver = i.get();
 		while(curr_ver == i.get())
 			Thread.currentThread().wait();
