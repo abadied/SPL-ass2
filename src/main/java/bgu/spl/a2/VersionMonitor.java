@@ -28,12 +28,16 @@ public class VersionMonitor {
 
 	public void inc() {
 		i.incrementAndGet();
-		notifyAll();
+		synchronized(this) {
+			notifyAll();
+		}
 	}
 	
 	public void await(int version) throws InterruptedException {
 		int curr_ver = i.get();
-		while (curr_ver == i.get())
-			Thread.currentThread().wait();
+		if (curr_ver == version)
+			synchronized(this) {
+				wait();
+			}
 	}
 }

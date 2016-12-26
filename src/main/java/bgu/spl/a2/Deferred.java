@@ -1,5 +1,6 @@
 package bgu.spl.a2;
 
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -20,11 +21,11 @@ import java.util.concurrent.atomic.AtomicReference;
 public class Deferred<T> {
 
 	private AtomicReference<T>  value;
-	private AtomicReference<Runnable> callback;
+	private ConcurrentLinkedQueue<Runnable> callbacks;
 	
 	public Deferred(){
 		value = new AtomicReference<T>(null);
-		callback = new AtomicReference<Runnable>(null);
+		callbacks = new ConcurrentLinkedQueue<>();
 	}
 	
 	/**
@@ -86,18 +87,19 @@ public class Deferred<T> {
 	 *            the callback to be called when the deferred object is resolved
 	 */
 	public void whenResolved(Runnable callback) {
-		this.callback.set(callback);
+		this.callbacks.add(callback);
 		
 		runCallback(); // try to run the callback in case this object was already resolved
 	}
 	
-	// This function runs the callback only after resolve
+	// This function runs the callbacks only after resolve
 	private void runCallback() {
 		if (isResolved()){
-			Runnable cb = callback.getAndSet(null); // copying the callback and removing it from object atomically to avoid being called twice
-			
-			if (cb != null)
-				cb.run();
+			while (!callbacks.isEmpty()) {
+				Runnable cb = callbacks.poll(); 
+				if (cb != null)
+					cb.run();
+			}
 		}
 	}
 }

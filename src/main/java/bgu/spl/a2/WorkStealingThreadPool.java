@@ -40,6 +40,7 @@ public class WorkStealingThreadPool {
 		processors = new ArrayList<Processor>();
 		queues = new ArrayList<ConcurrentLinkedDeque<Task<?>>>();
 		threads = new ArrayList<Thread>();
+		versionMonitor = new VersionMonitor();
 		
 		for(int i=0; i < nthreads; i++){
 			processors.add(new Processor(i,this));
@@ -57,8 +58,6 @@ public class WorkStealingThreadPool {
 	public void submit(Task<?> task) {
 		int id = (int)(Math.random() * (processors.size() - 1));
 		addTasksToProcessor(id, task);
-		
-		versionMonitor.inc(); // informs all waiting processors that there's a new task in the pool
 	}
 
 	/**
@@ -77,6 +76,8 @@ public class WorkStealingThreadPool {
 	public void shutdown() throws InterruptedException {
 		for(Thread t: threads)
 			t.interrupt();
+		for(Thread t: threads)
+			t.join();
 	}
 
 	/**
@@ -104,8 +105,9 @@ public class WorkStealingThreadPool {
 			currVersion = versionMonitor.getVersion();
 			
 			t = queues.get(id).pollFirst();
-			if (t == null) // nothing in queue
+			if (t == null) { // nothing in queue
 				t = stealAndFetch(id);
+			}
 			if (t == null) { // nothing to steal
 				versionMonitor.await(currVersion); // wait until the pool gets new Tasks
 			}
@@ -125,7 +127,7 @@ public class WorkStealingThreadPool {
 		Task<?> t = null;
 		
 		for (int i = robberId + 1; (i % nthreads) != robberId; i++) {
-			t = stealFromVictimAndFetch(robberId, i);
+			t = stealFromVictimAndFetch(robberId, i % nthreads);
 			if (t != null)
 				break;
 		}
@@ -173,5 +175,6 @@ public class WorkStealingThreadPool {
 		for (Task<?> task : tasks) {
 			queues.get(id).add(task);
 		}
+		versionMonitor.inc(); // informs all waiting processors that there's a new task in the pool
 	}
 }

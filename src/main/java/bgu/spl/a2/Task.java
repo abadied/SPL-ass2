@@ -18,7 +18,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public abstract class Task<R> {
 
 	Processor currentHandler;
-	Deferred<R> deferred;
+	Deferred<R> deferred = new Deferred<>();
 	Runnable callback;
 	AtomicInteger childTasksLeft;
 	boolean started = false;
@@ -48,10 +48,13 @@ public abstract class Task<R> {
 	 */
 	/* package */ final void handle(Processor handler) {
 		currentHandler = handler;
-		if (!started)
+		if (!started){
+			started = true;
 			start();
-		else
+		}
+		else {
 			callback.run();
+		}
 	}
 
 	/**
@@ -89,8 +92,9 @@ public abstract class Task<R> {
 	 * Once all child tasks are resolved, this task will be added back to the queue.
 	 */
 	protected final void reportResolve(){
-		if(childTasksLeft.decrementAndGet() == 0)
+		if(childTasksLeft.decrementAndGet() == 0) {
 			currentHandler.addTasks(this);
+		}
 	}
 
 	/**
