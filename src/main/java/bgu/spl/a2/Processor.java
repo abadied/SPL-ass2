@@ -15,8 +15,6 @@ public class Processor implements Runnable {
 
 	private final WorkStealingThreadPool pool;
 	private final int id;
-	
-	boolean shutdown;
 
 	/**
 	 * constructor for this class
@@ -38,8 +36,6 @@ public class Processor implements Runnable {
 	/* package */ Processor(int id, WorkStealingThreadPool pool) {
 		this.id = id;
 		this.pool = pool;
-		
-		shutdown = false;
 	}
 
 	@Override
