@@ -39,6 +39,7 @@ public class WorkStealingThreadPool {
 		this.nthreads = nthreads;
 		processors = new ArrayList<Processor>();
 		queues = new ArrayList<ConcurrentLinkedDeque<Task<?>>>();
+		threads = new ArrayList<Thread>();
 		
 		for(int i=0; i < nthreads; i++){
 			processors.add(new Processor(i,this));
