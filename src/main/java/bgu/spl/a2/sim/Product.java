@@ -6,6 +6,9 @@ import java.util.List;
  * A class that represents a product produced during the simulation.
  */
 public class Product {
+	private long startId;
+	private String name;
+	private long finalId;
 	/**
 	 * Constructor
 	 * 
@@ -15,23 +18,21 @@ public class Product {
 	 *            - Product name
 	 */
 	public Product(long startId, String name) {
-		// TODO
+		this.startId = startId;
+		this.name = name;
 	}
 
 	/**
 	 * @return The product name as a string
 	 */
 	public String getName() {
-		// TODO
-		return null;// change
+		return name;
 	}
-
 	/**
 	 * @return The product start ID as a long. start ID should never be changed.
 	 */
 	public long getStartId() {
-		// TODO
-		return 0;// change
+		return startId;
 	}
 
 	/**
@@ -39,8 +40,8 @@ public class Product {
 	 *         received as the sum of all UseOn();
 	 */
 	public long getFinalId() {
-		// TODO
-		return 0;// change
+		//TODO:check
+		return finalId;
 	}
 
 	/**
