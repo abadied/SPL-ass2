@@ -1,6 +1,8 @@
 package bgu.spl.a2;
 
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -19,7 +21,7 @@ public abstract class Task<R> {
 
 	Processor currentHandler;
 	Deferred<R> deferred = new Deferred<>();
-	Runnable callback;
+	LinkedList<Runnable> callbacks = new LinkedList<>();
 	AtomicInteger childTasksLeft;
 	boolean started = false;
 	
@@ -53,7 +55,9 @@ public abstract class Task<R> {
 			start();
 		}
 		else {
-			callback.run();
+			while (!callbacks.isEmpty()){
+				callbacks.poll().run();
+			}
 		}
 	}
 
@@ -80,7 +84,7 @@ public abstract class Task<R> {
 	 *            the callback to execute once all the results are resolved
 	 */
 	protected final void whenResolved(Collection<? extends Task<?>> tasks, Runnable callback) {
-		this.callback = callback;
+		this.callbacks.add(callback); // save the callback to be ran
 		this.childTasksLeft = new AtomicInteger(tasks.size());
 		for (Task<?> task : tasks)
 			task.getResult().whenResolved(() -> { reportResolve(); }); // when a child task is done, report to this task

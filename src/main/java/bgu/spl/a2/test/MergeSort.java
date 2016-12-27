@@ -9,12 +9,8 @@ import bgu.spl.a2.Task;
 import bgu.spl.a2.WorkStealingThreadPool;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 public class MergeSort extends Task<int[]> {
 

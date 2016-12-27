@@ -70,7 +70,7 @@ public class Deferred<T> {
 		if (!this.value.compareAndSet(null, value))
 			throw new IllegalStateException();
 		
-		runCallback(); // try to run the callback if it wasn't already ran
+		runCallback(); // try to run the callbacks if it wasn't already ran
 	}
 
 	/**
@@ -89,14 +89,14 @@ public class Deferred<T> {
 	public void whenResolved(Runnable callback) {
 		this.callbacks.add(callback);
 		
-		runCallback(); // try to run the callback in case this object was already resolved
+		runCallback(); // try to run the callbacks in case this object was already resolved
 	}
 	
 	// This function runs the callbacks only after resolve
 	private void runCallback() {
 		if (isResolved()){
-			while (!callbacks.isEmpty()) {
-				Runnable cb = callbacks.poll(); 
+			while (!callbacks.isEmpty()) { // go through all the callbacks
+				Runnable cb = callbacks.poll(); // retrieve and remove atomically
 				if (cb != null)
 					cb.run();
 			}
