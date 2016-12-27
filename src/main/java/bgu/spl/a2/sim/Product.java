@@ -1,5 +1,6 @@
 package bgu.spl.a2.sim;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -9,6 +10,7 @@ public class Product {
 	private long startId;
 	private String name;
 	private long finalId;
+	private LinkedList<Product> parts;
 	/**
 	 * Constructor
 	 * 
@@ -20,6 +22,7 @@ public class Product {
 	public Product(long startId, String name) {
 		this.startId = startId;
 		this.name = name;
+		parts = new LinkedList<Product>();
 	}
 
 	/**
@@ -48,8 +51,8 @@ public class Product {
 	 * @return Returns all parts of this product as a List of Products
 	 */
 	public List<Product> getParts() {
-		// TODO
-		return null;// change
+		// TODO:check!
+		return parts;
 	}
 
 	/**
@@ -59,7 +62,8 @@ public class Product {
 	 *            - part to be added as a Product object
 	 */
 	public void addPart(Product p) {
-		// TODO
+		// TODO:check!!
+		parts.add(p);
 	}
 
 }
