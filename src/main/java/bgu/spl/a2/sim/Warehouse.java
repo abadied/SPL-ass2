@@ -2,6 +2,10 @@ package bgu.spl.a2.sim;
 
 import bgu.spl.a2.sim.tools.Tool;
 import bgu.spl.a2.sim.conf.ManufactoringPlan;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+
 import bgu.spl.a2.Deferred;
 
 /**
@@ -15,11 +19,15 @@ import bgu.spl.a2.Deferred;
  */
 public class Warehouse {
 
+	private LinkedList<ManufactoringPlan> plans;
+	private ArrayList<LinkedList<Tool>> tools;
 	/**
 	 * Constructor
 	 */
 	public Warehouse() {
 		// TODO
+		plans = new LinkedList<ManufactoringPlan>();
+		tools = new ArrayList<LinkedList<Tool>>();
 	}
 
 	/**
@@ -32,6 +40,7 @@ public class Warehouse {
 	 */
 	public Deferred<Tool> acquireTool(String type) {
 		// TODO
+		
 		return null;// change
 	}
 
@@ -56,6 +65,11 @@ public class Warehouse {
 	 */
 	public ManufactoringPlan getPlan(String product) {
 		// TODO
+		for(int i = 0 ; i < plans.size() ; i++){
+			if(plans.get(i).getProductName().equals(product))
+				return plans.remove(i);
+				
+		}
 		return null;// change
 	}
 
@@ -67,6 +81,7 @@ public class Warehouse {
 	 */
 	public void addPlan(ManufactoringPlan plan) {
 		// TODO
+		plans.addLast(plan);
 
 	}
 
@@ -81,6 +96,22 @@ public class Warehouse {
 	 */
 	public void addTool(Tool tool, int qty) {
 		// TODO
+		switch(tool.getType()){
+		case "gs-driver": this.addToolByType(tool,qty ,0);
+			break;
+		case "np-hammer": this.addToolByType(tool,qty ,1);
+			break;
+		case "rs-pliers": this.addToolByType(tool,qty ,2);
+			break;
+		default : break;
+		}
+	}
+	
+	//add the tool by his type "qty" times
+	private void addToolByType(Tool tool, int qty , int type){
+		for(int i = 0 ; i < qty ; i++){
+			tools.get(0).add(tool);
+		}
 	}
 
 }

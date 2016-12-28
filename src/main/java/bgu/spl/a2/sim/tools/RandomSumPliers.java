@@ -9,7 +9,7 @@ public class RandomSumPliers implements Tool {
 	@Override
 	public String getType() {
 		//TODO:check if anything else needed in this function
-		return new String("rsp");
+		return new String("rs-pliers");
 	}
 
 	@Override

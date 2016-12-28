@@ -14,7 +14,7 @@ public class GcdScrewDriver implements Tool {
 	@Override
 	public String getType() {
 		//TODO:check if anything else needed in this function
-		return new String("gsd");
+		return new String("gs-driver");
 	}
 
 
