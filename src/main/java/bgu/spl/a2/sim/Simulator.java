@@ -5,9 +5,16 @@
  */
 package bgu.spl.a2.sim;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import com.google.gson.Gson;
 
 import bgu.spl.a2.WorkStealingThreadPool;
+import bgu.spl.a2.sim.conf.ManufactoringPlan;
+import bgu.spl.a2.sim.tools.Tool;
 
 
 /**
@@ -30,7 +37,35 @@ public class Simulator {
 		
 	}
 	
-	public static int main(String [] args){
-		return 0;
+	public static void main(String [] args){
+		
+		Gson gson = new Gson();
+		InputParse input = null;
+		try (BufferedReader br = new BufferedReader(new FileReader(args[0]));){
+			input = gson.fromJson(br, InputParse.class);
+		} catch (IOException e) {
+			System.out.println("failed to read file");
+		}
+		
+		if (input == null) {
+			System.out.println("error reading file");
+			System.exit(1);
+		}
+		
+		//WorkStealingThreadPool pool = new WorkStealingThreadPool(input.nthreads);
+		int a=2;
+	}
+	
+	private class InputParse {
+		int nthreads;
+		Tool[] tools;
+		ManufactoringPlan[] plans;
+		Wave waves;
+	}
+	
+	private class Wave {
+		Product product;
+		int qty;
+		int startId;
 	}
 }
