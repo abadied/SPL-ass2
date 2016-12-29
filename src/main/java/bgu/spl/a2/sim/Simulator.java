@@ -6,43 +6,71 @@
 package bgu.spl.a2.sim;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import com.google.gson.Gson;
 
+import bgu.spl.a2.Task;
 import bgu.spl.a2.WorkStealingThreadPool;
 import bgu.spl.a2.sim.conf.ManufactoringPlan;
-import bgu.spl.a2.sim.tools.Tool;
+import bgu.spl.a2.sim.tools.GcdScrewDriver;
+import bgu.spl.a2.sim.tools.NextPrimeHammer;
+import bgu.spl.a2.sim.tools.RandomSumPliers;
 
 
 /**
  * A class describing the simulator for part 2 of the assignment
  */
 public class Simulator {
+	
+	static WorkStealingThreadPool pool;
+	static ConcurrentLinkedQueue<Product> products;
+	static GsonReader input;
+	static ArrayList<ManufactoringPlan> plans;
+	static Warehouse warehouse;
+	
 	/**
 	* Begin the simulation
 	* Should not be called before attachWorkStealingThreadPool()
 	*/
     public static ConcurrentLinkedQueue<Product> start(){
-    	return null; // TODO
+    	//pool.start();
+    	int qty = 0;
+    	BuildProductTask task;
+    	for (GsonReader.Zerg[] wave: input.waves){
+			for (GsonReader.Zerg zerg: wave){
+				for (int i = 0; i < zerg.qty; i++){
+					task = new BuildProductTask(zerg.product, zerg.startId + i);
+					pool.submit(task);
+					// add callback to deferred
+					qty++;
+				}
+			}
+			// wait for prodcuts.size == qty
+		}
+    	
+    	return products;
     }
+    
 	
 	/**
 	* attach a WorkStealingThreadPool to the Simulator, this WorkStealingThreadPool will be used to run the simulation
 	* @param myWorkStealingThreadPool - the WorkStealingThreadPool which will be used by the simulator
 	*/
 	public static void attachWorkStealingThreadPool(WorkStealingThreadPool myWorkStealingThreadPool){
-		
+		pool = myWorkStealingThreadPool;
 	}
 	
 	public static void main(String [] args){
 		
+		//// Read JSON file into GsonReader class
 		Gson gson = new Gson();
-		InputParse input = null;
+		input = null;
 		try (BufferedReader br = new BufferedReader(new FileReader(args[0]));){
-			input = gson.fromJson(br, InputParse.class);
+			input = gson.fromJson(br, GsonReader.class);
+			System.out.println("file read");
 		} catch (IOException e) {
 			System.out.println("failed to read file");
 		}
@@ -52,20 +80,30 @@ public class Simulator {
 			System.exit(1);
 		}
 		
-		//WorkStealingThreadPool pool = new WorkStealingThreadPool(input.nthreads);
-		int a=2;
-	}
-	
-	private class InputParse {
-		int nthreads;
-		Tool[] tools;
-		ManufactoringPlan[] plans;
-		Wave waves;
-	}
-	
-	private class Wave {
-		Product product;
-		int qty;
-		int startId;
+		//// Create Pool
+		Simulator.attachWorkStealingThreadPool(new WorkStealingThreadPool(input.nthreads));
+		
+		//// Create Tools
+		warehouse = new Warehouse();
+		for (GsonReader.ToolInfo tooli: input.tools){
+			switch (tooli.tool){
+			case "gs-driver":
+				warehouse.addTool(new GcdScrewDriver(), tooli.qty);
+				break;
+			case "np-hammer":
+				warehouse.addTool(new NextPrimeHammer(), tooli.qty);
+				break;
+			case "rs-pliers":
+				warehouse.addTool(new RandomSumPliers(), tooli.qty);
+				break;
+			}
+		}
+			
+		//// Create Plans
+		plans = new ArrayList<>();
+		for (GsonReader.Plan plan: input.plans)
+			plans.add(new ManufactoringPlan(plan.product, plan.parts, plan.tools));
+		
+		Simulator.start();
 	}
 }

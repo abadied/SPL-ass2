@@ -7,8 +7,8 @@ package bgu.spl.a2.sim.conf;
 public class ManufactoringPlan {
 	
 	private String product;
-	private String[] parts;
 	private String[] tools;
+	private String[] parts;
 	
 	/**
 	 * ManufactoringPlan constructor
