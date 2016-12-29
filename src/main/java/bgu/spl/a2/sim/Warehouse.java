@@ -5,6 +5,7 @@ import bgu.spl.a2.sim.conf.ManufactoringPlan;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 import bgu.spl.a2.Deferred;
 
@@ -20,14 +21,16 @@ import bgu.spl.a2.Deferred;
 public class Warehouse {
 
 	private LinkedList<ManufactoringPlan> plans;
-	private ArrayList<LinkedList<Tool>> tools;
+	private ArrayList<ConcurrentLinkedDeque<Tool>> tools;
+	private ConcurrentLinkedDeque<Deferred<Tool>> deferreds;
 	/**
 	 * Constructor
 	 */
 	public Warehouse() {
 		// TODO
 		plans = new LinkedList<ManufactoringPlan>();
-		tools = new ArrayList<LinkedList<Tool>>();
+		tools = new ArrayList<ConcurrentLinkedDeque<Tool>>();
+		deferreds = new ConcurrentLinkedDeque<Deferred<Tool>>();
 	}
 
 	/**
@@ -110,7 +113,7 @@ public class Warehouse {
 	//add the tool by his type "qty" times
 	private void addToolByType(Tool tool, int qty , int type){
 		for(int i = 0 ; i < qty ; i++){
-			tools.get(0).add(tool);
+			tools.get(type).add(tool);
 		}
 	}
 
