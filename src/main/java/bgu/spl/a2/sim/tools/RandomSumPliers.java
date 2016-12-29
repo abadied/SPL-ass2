@@ -19,4 +19,5 @@ public class RandomSumPliers implements Tool {
         return Long.parseLong(b.nextProbablePrime().toString());
 	}
 
+	
 }
