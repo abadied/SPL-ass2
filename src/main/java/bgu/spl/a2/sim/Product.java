@@ -23,6 +23,7 @@ public class Product {
 		this.startId = startId;
 		this.name = name;
 		parts = new LinkedList<Product>();
+		finalId = startId;
 	}
 
 	/**
