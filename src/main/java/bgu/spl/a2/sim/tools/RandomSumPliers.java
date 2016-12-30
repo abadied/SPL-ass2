@@ -15,8 +15,13 @@ public class RandomSumPliers implements Tool {
 	@Override
 	public long useOn(Product p) {
 		// TODO : check!!!!
+		long result = 0;
 		BigInteger b = new BigInteger(String.valueOf(p.getStartId() + 1));
-        return Long.parseLong(b.nextProbablePrime().toString());
+		long prime = Long.parseLong(b.nextProbablePrime().toString());
+		for(int i = 0 ; i < p.getParts().size() ; i++){
+			result += prime;
+		}
+        return result;
 	}
 
 	

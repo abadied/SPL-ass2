@@ -22,8 +22,10 @@ public class NextPrimeHammer implements Tool {
 		//TODO:check!!!!
 		Random r = new Random(p.getStartId() + 1);
 		long sum = 0;
-		for(int i = 0; i < (p.getStartId()%10000); i++){
-			sum += r.nextInt();
+		for(int i = 0;i < p.getParts().size() ; i++){
+			for(int j = 0; j < (p.getStartId()%10000); j++){
+				sum += r.nextInt();
+			}
 		}
 		return sum;
 	}
