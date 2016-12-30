@@ -1,7 +1,5 @@
 package bgu.spl.a2.sim;
 
-import java.util.ArrayList;
-
 import bgu.spl.a2.Deferred;
 import bgu.spl.a2.Task;
 import bgu.spl.a2.sim.tools.Tool;
@@ -9,18 +7,15 @@ import bgu.spl.a2.sim.tools.Tool;
 public class UseToolTask extends Task<Long>{
 	
 	Product product;
-	ArrayList<Deferred<Tool>> tools;
+	Deferred<Tool> dTool;
 	
-	public UseToolTask(Product product){
+	public UseToolTask(Product product, Deferred<Tool> dTool){
 		this.product = product;
-		tools = new ArrayList<Deferred<Tool>>();
+		this.dTool = dTool;
 	}
 	
 	@Override
 	protected void start() {
-		
-		for(String s: Simulator.warehouse.getPlan(product.getName()).getTools()){
-			tools.add(Simulator.warehouse.acquireTool(s));
-		}
+		complete(dTool.get().useOn(product));
 	}
 }
