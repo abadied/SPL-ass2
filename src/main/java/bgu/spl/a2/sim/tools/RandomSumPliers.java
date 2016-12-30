@@ -15,7 +15,7 @@ public class RandomSumPliers implements Tool {
 	@Override
 	public long useOn(Product p) {
 		// TODO : check!!!!
-		BigInteger b = new BigInteger(String.valueOf(p.getStartId()));
+		BigInteger b = new BigInteger(String.valueOf(p.getStartId() + 1));
         return Long.parseLong(b.nextProbablePrime().toString());
 	}
 

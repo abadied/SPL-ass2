@@ -20,7 +20,7 @@ public class NextPrimeHammer implements Tool {
 	@Override
 	public long useOn(Product p) {
 		//TODO:check!!!!
-		Random r = new Random(p.getStartId());
+		Random r = new Random(p.getStartId() + 1);
 		long sum = 0;
 		for(int i = 0; i < (p.getStartId()%10000); i++){
 			sum += r.nextInt();

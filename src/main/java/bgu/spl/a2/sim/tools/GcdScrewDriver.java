@@ -21,8 +21,8 @@ public class GcdScrewDriver implements Tool {
 	@Override
 	public long useOn(Product p) {
 		//TODO: check!!!
-		long reverse_id = Long.reverse(p.getStartId());
-		BigInteger b1 = BigInteger.valueOf(p.getStartId());
+		long reverse_id = Long.reverse(p.getStartId() + 1);
+		BigInteger b1 = BigInteger.valueOf(p.getStartId() + 1);
 	    BigInteger b2 = BigInteger.valueOf(reverse_id);
 	    BigInteger gcd = b1.gcd(b2);
 	    return gcd.intValue();
