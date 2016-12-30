@@ -6,8 +6,10 @@
 package bgu.spl.a2.sim;
 
 import java.io.BufferedReader;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -106,6 +108,19 @@ public class Simulator {
 		for (GsonReader.Plan plan: input.plans)
 			warehouse.addPlan(new ManufactoringPlan(plan.product, plan.parts, plan.tools));
 		
-		Simulator.start();
+		//write the result file
+		ConcurrentLinkedQueue<Product> SimulationResult;
+		SimulationResult = Simulator.start();
+		try{
+			FileOutputStream fout = new FileOutputStream("result.ser");
+			ObjectOutputStream oos = new ObjectOutputStream(fout);
+			oos.writeObject(SimulationResult);
+			oos.close();//check if need to close
+		}
+		catch(IOException e){
+			System.out.println(e.getMessage());//for testing only!
+		}
+		
+		
 	}
 }
