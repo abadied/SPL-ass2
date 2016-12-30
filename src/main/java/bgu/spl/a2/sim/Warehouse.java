@@ -11,7 +11,6 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import bgu.spl.a2.Deferred;
-import bgu.spl.a2.Task;
 
 /**
  * A class representing the warehouse in your simulation
@@ -138,13 +137,12 @@ public class Warehouse {
 	 * @return A ManufactoringPlan for product
 	 */
 	public ManufactoringPlan getPlan(String product) {
-		// TODO:check
 		for(int i = 0 ; i < plans.size() ; i++){
 			if(plans.get(i).getProductName().equals(product))
-				return plans.remove(i);
+				return plans.get(i);
 				
 		}
-		return null;// change
+		return null; // if none found
 	}
 
 	/**

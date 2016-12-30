@@ -10,15 +10,11 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.google.gson.Gson;
 
-import bgu.spl.a2.Deferred;
-import bgu.spl.a2.Task;
 import bgu.spl.a2.WorkStealingThreadPool;
 import bgu.spl.a2.sim.conf.ManufactoringPlan;
 import bgu.spl.a2.sim.tools.GcdScrewDriver;
@@ -32,34 +28,55 @@ import bgu.spl.a2.sim.tools.RandomSumPliers;
 public class Simulator {
 	
 	static WorkStealingThreadPool pool;
-	static ConcurrentLinkedQueue<Product> products;
 	static GsonReader input;
 	static Warehouse warehouse;
+	static AtomicInteger finished;
+	
+	static Object lock;
 	
 	/**
 	* Begin the simulation
 	* Should not be called before attachWorkStealingThreadPool()
 	*/
     public static ConcurrentLinkedQueue<Product> start(){
+    	lock = new Object();
     	pool.start();
+    	ConcurrentLinkedQueue<Product> products = new ConcurrentLinkedQueue<>();
     	int qty = 0;
+    	finished = new AtomicInteger(0);
     	for (GsonReader.Zerg[] wave: input.waves) {
-			for (GsonReader.Zerg zerg: wave) {
+			for (GsonReader.Zerg zerg : wave) {
 				for (int i = 0; i < zerg.qty; i++){
 					BuildProductTask task = new BuildProductTask(new Product(zerg.startId, zerg.product));
 					pool.submit(task);
-					task.getResult().whenResolved(() -> products.add(task.getResult().get()) );
+					task.getResult().whenResolved(() -> {
+									products.add(task.getResult().get());
+									reportFinished();
+								});
 					qty++;
 				}
 			}
-			
+			synchronized(lock) {
+				try {
+					while(finished.get() < qty)
+						lock.wait();
+				} catch (InterruptedException e){
+					System.out.println("interrupted");
+					System.exit(1);
+				}
+			}
 		}
     	
     	return products;
     }
     
+    private static void reportFinished(){
+    	synchronized (lock) {
+    		finished.incrementAndGet();
+    		lock.notify();
+		}
+    }
     
-	
 	/**
 	* attach a WorkStealingThreadPool to the Simulator, this WorkStealingThreadPool will be used to run the simulation
 	* @param myWorkStealingThreadPool - the WorkStealingThreadPool which will be used by the simulator
@@ -111,6 +128,12 @@ public class Simulator {
 		//write the result file
 		ConcurrentLinkedQueue<Product> SimulationResult;
 		SimulationResult = Simulator.start();
+		
+		try {
+			pool.shutdown();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 		try{
 			FileOutputStream fout = new FileOutputStream("result.ser");
 			ObjectOutputStream oos = new ObjectOutputStream(fout);
