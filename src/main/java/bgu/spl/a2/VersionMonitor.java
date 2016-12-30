@@ -35,9 +35,9 @@ public class VersionMonitor {
 	
 	public void await(int version) throws InterruptedException {
 		int curr_ver = i.get();
-		if (curr_ver == version)
-			synchronized(this) {
+		synchronized(this) {
+		while (curr_ver == version)
 				wait();
-			}
+		}
 	}
 }

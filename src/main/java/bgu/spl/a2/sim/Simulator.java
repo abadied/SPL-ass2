@@ -9,9 +9,13 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import com.google.gson.Gson;
 
+import bgu.spl.a2.Deferred;
 import bgu.spl.a2.Task;
 import bgu.spl.a2.WorkStealingThreadPool;
 import bgu.spl.a2.sim.conf.ManufactoringPlan;
@@ -37,21 +41,21 @@ public class Simulator {
     public static ConcurrentLinkedQueue<Product> start(){
     	//pool.start();
     	int qty = 0;
-    	BuildProductTask task;
-    	for (GsonReader.Zerg[] wave: input.waves){
-			for (GsonReader.Zerg zerg: wave){
+    	for (GsonReader.Zerg[] wave: input.waves) {
+			for (GsonReader.Zerg zerg: wave) {
 				for (int i = 0; i < zerg.qty; i++){
-					task = new BuildProductTask(zerg.product, zerg.startId + i);
+					BuildProductTask task = new BuildProductTask(zerg.product, zerg.startId + i);
 					pool.submit(task);
-					// add callback to deferred
+					task.getResult().whenResolved(() -> products.add(task.getResult().get()) );
 					qty++;
 				}
 			}
-			// wait for prodcuts.size == qty
+			
 		}
     	
     	return products;
     }
+    
     
 	
 	/**
