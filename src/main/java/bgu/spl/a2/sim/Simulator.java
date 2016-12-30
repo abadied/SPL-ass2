@@ -115,7 +115,7 @@ public class Simulator {
 			FileOutputStream fout = new FileOutputStream("result.ser");
 			ObjectOutputStream oos = new ObjectOutputStream(fout);
 			oos.writeObject(SimulationResult);
-			oos.close();
+			oos.close();//check if need to close
 		}
 		catch(IOException e){
 			System.out.println(e.getMessage());//for testing only!
