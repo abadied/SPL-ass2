@@ -74,39 +74,45 @@ public class MergeSort extends Task<int[]> {
 
 	
 	public static void main(String[] args) throws InterruptedException {
-		WorkStealingThreadPool pool = new WorkStealingThreadPool(10);
-		int n = 1_000_000; // you may check on different number of elements if you
-							// like
-		int[] array = new Random().ints(n).toArray();
 		
-		MergeSort task = new MergeSort(array);
-		CountDownLatch l = new CountDownLatch(1);
-		pool.start();
-		pool.submit(task);
-		task.getResult().whenResolved(() -> {
-			// warning - a large print!! - you can remove this line if you wish
-			//System.out.println(Arrays.toString(task.getResult().get()));
-			l.countDown();
-		});
-		
-		l.await();
-		
-		pool.shutdown();
-		
-		int[] arr = task.getResult().get();
-		
-		//checks if the array is really sorted
-		for (int i = 0; i < arr.length; i++) {
-			if (i == arr.length - 1){
-				System.out.println("GOOD!");
+		int counter = 0;
+		for(int k = 0 ; k<200 ; k++){
+			WorkStealingThreadPool pool = new WorkStealingThreadPool(10);
+			int n = 1_000_000; // you may check on different number of elements if you
+								// like
+			int[] array = new Random().ints(n).toArray();
+			
+			MergeSort task = new MergeSort(array);
+			CountDownLatch l = new CountDownLatch(1);
+			pool.start();
+			pool.submit(task);
+			task.getResult().whenResolved(() -> {
+				// warning - a large print!! - you can remove this line if you wish
+				//System.out.println(Arrays.toString(task.getResult().get()));
+				l.countDown();
+			});
+			
+			l.await();
+			
+			pool.shutdown();
+			
+			int[] arr = task.getResult().get();
+			
+			//checks if the array is really sorted
+			for (int i = 0; i < arr.length; i++) {
+				if (i == arr.length - 1){
+				//	System.out.println("GOOD!");
+				}
+				else if (arr[i] > arr[i+1]){
+				//	System.out.println("BAD! you failed!");
+					counter++;
+					break;
+				}
 			}
-			else if (arr[i] > arr[i+1]){
-				System.out.println("BAD! you failed!");
-				break;
-			}
+			
+			
 		}
-		
-		
+		System.out.println("number of errors:" + counter);
 	}
 
 }
