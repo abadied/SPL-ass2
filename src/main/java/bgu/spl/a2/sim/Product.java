@@ -65,5 +65,13 @@ public class Product {
 		// TODO:check!!
 		parts.add(p);
 	}
+	
+	/**
+	 * setter for finalId
+	 * @param id
+	 */
+	public void setFinalId(long id){
+		finalId += id;
+	}
 
 }
