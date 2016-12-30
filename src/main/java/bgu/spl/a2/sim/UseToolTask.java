@@ -17,5 +17,6 @@ public class UseToolTask extends Task<Long>{
 	@Override
 	protected void start() {
 		complete(dTool.get().useOn(product));
+		Simulator.warehouse.releaseTool(dTool.get());
 	}
 }

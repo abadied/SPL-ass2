@@ -73,6 +73,7 @@ public class Simulator {
     private static void reportFinished(){
     	synchronized (lock) {
     		finished.incrementAndGet();
+    		System.out.println("finished: " + finished.get());
     		lock.notify();
 		}
     }
