@@ -30,21 +30,21 @@ public class BuildProductTask extends Task<Product>{
 			tasksArr.add(t);
 		}
 		whenResolved(tasksArr, ()-> {
-			acquireTools(Simulator.warehouse, product);
+			acquireTools(product);
 			complete(product);
 			});
 		
 	}
 	
-	private void acquireTools(Warehouse warehouse , Product product){
+	private void acquireTools(Product product){
 		ConcurrentLinkedDeque<Deferred<Tool>> tools = new ConcurrentLinkedDeque<Deferred<Tool>>();
-		for(String s: warehouse.getPlan(product.getName()).getTools()){
-			tools.add(warehouse.acquireTool(s));
+		for(String s: Simulator.warehouse.getPlan(product.getName()).getTools()){
+			tools.add(Simulator.warehouse.acquireTool(s));
 		}
 		for(Deferred<Tool> d: tools){
 			d.whenResolved(()->{
 				product.setFinalId(d.get().useOn(product));
-				warehouse.releaseTool(d.get());
+				Simulator.warehouse.releaseTool(d.get());
 			});
 		}
 	}

@@ -39,7 +39,7 @@ public class Simulator {
 	* Should not be called before attachWorkStealingThreadPool()
 	*/
     public static ConcurrentLinkedQueue<Product> start(){
-    	//pool.start();
+    	pool.start();
     	int qty = 0;
     	for (GsonReader.Zerg[] wave: input.waves) {
 			for (GsonReader.Zerg zerg: wave) {
