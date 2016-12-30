@@ -28,7 +28,6 @@ public class Simulator {
 	static WorkStealingThreadPool pool;
 	static ConcurrentLinkedQueue<Product> products;
 	static GsonReader input;
-	static ArrayList<ManufactoringPlan> plans;
 	static Warehouse warehouse;
 	
 	/**
@@ -81,7 +80,7 @@ public class Simulator {
 		}
 		
 		//// Create Pool
-		Simulator.attachWorkStealingThreadPool(new WorkStealingThreadPool(input.nthreads));
+		Simulator.attachWorkStealingThreadPool(new WorkStealingThreadPool(input.threads));
 		
 		//// Create Tools
 		warehouse = new Warehouse();
@@ -100,9 +99,8 @@ public class Simulator {
 		}
 			
 		//// Create Plans
-		plans = new ArrayList<>();
 		for (GsonReader.Plan plan: input.plans)
-			plans.add(new ManufactoringPlan(plan.product, plan.parts, plan.tools));
+			warehouse.addPlan(new ManufactoringPlan(plan.product, plan.parts, plan.tools));
 		
 		Simulator.start();
 	}

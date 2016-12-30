@@ -1,7 +1,7 @@
 package bgu.spl.a2.sim;
 
 public class GsonReader {
-	int nthreads;
+	int threads;
 	ToolInfo[] tools;
 	Plan[] plans;
 	Zerg[][] waves;
