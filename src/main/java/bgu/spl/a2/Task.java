@@ -21,7 +21,7 @@ public abstract class Task<R> {
 
 	Processor currentHandler;
 	Deferred<R> deferred = new Deferred<>();
-	LinkedList<Runnable> callbacks = new LinkedList<>();
+	Runnable callback;
 	AtomicInteger childTasksLeft;
 	boolean started = false;
 	
@@ -55,9 +55,7 @@ public abstract class Task<R> {
 			start();
 		}
 		else {
-			while (!callbacks.isEmpty()){
-				callbacks.poll().run();
-			}
+			callback.run();
 		}
 	}
 
@@ -84,7 +82,7 @@ public abstract class Task<R> {
 	 *            the callback to execute once all the results are resolved
 	 */
 	protected final void whenResolved(Collection<? extends Task<?>> tasks, Runnable callback) {
-		this.callbacks.add(callback); // save the callback to be ran
+		this.callback = callback; // save the callback to be ran
 		this.childTasksLeft = new AtomicInteger(tasks.size());
 		for (Task<?> task : tasks)
 			task.getResult().whenResolved(() -> { reportResolve(); }); // when a child task is done, report to this task
@@ -95,7 +93,7 @@ public abstract class Task<R> {
 	 * 
 	 * Once all child tasks are resolved, this task will be added back to the queue.
 	 */
-	protected final void reportResolve(){
+	private final void reportResolve(){
 		if(childTasksLeft.decrementAndGet() == 0) {
 			currentHandler.addTasks(this);
 		}
@@ -118,5 +116,4 @@ public abstract class Task<R> {
 	public final Deferred<R> getResult() {
 		return deferred;
 	}
-
 }
