@@ -20,6 +20,6 @@ public class GsonReader {
 	class Zerg {
 		String product;
 		int qty;
-		int startId;
+		long startId;
 	}
 }

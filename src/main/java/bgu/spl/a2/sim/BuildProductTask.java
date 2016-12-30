@@ -11,20 +11,18 @@ import bgu.spl.a2.test.MergeSort;
 
 public class BuildProductTask extends Task<Product>{
 	
-	Warehouse warehouse;
 	Product product;
 	
-	public BuildProductTask(Warehouse warehouse, Product product){
-		this.warehouse = warehouse;
+	public BuildProductTask(Product product){
 		this.product = product;
 	}
 	
 	@Override
 	protected void start() {
-		String[]  parts = warehouse.getPlan(product.getName()).getParts();
+		String[]  parts = Simulator.warehouse.getPlan(product.getName()).getParts();
 		BuildProductTask[] tasks = new BuildProductTask[parts.length];
 		for(int i = 0; i<parts.length; i++){
-			tasks[i] = new BuildProductTask(warehouse , new Product(product.getStartId() + 1,parts[i]));
+			tasks[i] = new BuildProductTask(new Product(product.getStartId() + 1,parts[i]));
 		}
 		spawn(tasks);
 		ArrayList<BuildProductTask> tasksArr = new ArrayList<>();
@@ -32,7 +30,7 @@ public class BuildProductTask extends Task<Product>{
 			tasksArr.add(t);
 		}
 		whenResolved(tasksArr, ()-> {
-			acquireTools(warehouse, product);
+			acquireTools(Simulator.warehouse, product);
 			complete(product);
 			});
 		

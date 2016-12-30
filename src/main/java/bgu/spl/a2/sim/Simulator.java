@@ -44,7 +44,7 @@ public class Simulator {
     	for (GsonReader.Zerg[] wave: input.waves) {
 			for (GsonReader.Zerg zerg: wave) {
 				for (int i = 0; i < zerg.qty; i++){
-					BuildProductTask task = new BuildProductTask(zerg.product, zerg.startId + i);
+					BuildProductTask task = new BuildProductTask(new Product(zerg.startId, zerg.product));
 					pool.submit(task);
 					task.getResult().whenResolved(() -> products.add(task.getResult().get()) );
 					qty++;
