@@ -4,8 +4,8 @@
 package bgu.spl.a2.sim.tools;
 
 import bgu.spl.a2.sim.Product;
-import java.util.Random;
 
+import java.math.BigInteger;
 
 public class NextPrimeHammer implements Tool {
 
@@ -17,17 +17,19 @@ public class NextPrimeHammer implements Tool {
 	}
 
 
+	
+	
 	@Override
 	public long useOn(Product p) {
-		//TODO:check!!!!
-		Random r = new Random(p.getStartId() + 1);
-		long sum = 0;
-		for(int i = 0;i < p.getParts().size() ; i++){
-			for(int j = 0; j < (p.getStartId()%10000); j++){
-				sum += r.nextInt();
-			}
+		
+		long result = 0;
+		BigInteger prime;
+		for(Product part : p.getParts()){
+			BigInteger b = new BigInteger(String.valueOf(part.getFinalId()));
+			prime = b.nextProbablePrime();
+			result += prime.longValue();
 		}
-		return sum;
+        return result;
 	}
 
 }

@@ -1,6 +1,6 @@
 package bgu.spl.a2.sim.tools;
 
-import java.math.BigInteger;
+import java.util.Random;
 
 import bgu.spl.a2.sim.Product;
 
@@ -14,14 +14,17 @@ public class RandomSumPliers implements Tool {
 
 	@Override
 	public long useOn(Product p) {
-		// TODO : check!!!!
-		long result = 0;
-		BigInteger b = new BigInteger(String.valueOf(p.getStartId() + 1));
-		long prime = Long.parseLong(b.nextProbablePrime().toString());
-		for(int i = 0 ; i < p.getParts().size() ; i++){
-			result += prime;
+		
+		long sum = 0;
+		for(Product part : p.getParts()){
+			Random r = new Random(part.getFinalId());
+			long partsum = 0;
+			for(int j = 0; j < (part.getFinalId()%10000); j++){
+				partsum += r.nextInt();
+			}
+			sum += Math.abs(partsum);
 		}
-        return result;
+		return sum;
 	}
 
 	

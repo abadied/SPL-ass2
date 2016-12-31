@@ -136,12 +136,6 @@ public class Simulator {
 			e.printStackTrace();
 		}
 		try{
-			
-			//Testing the list output
-			for(Product p : SimulationResult){
-				System.out.println(p.getFinalId());
-			}
-			
 			//writing the result.ser file
 			FileOutputStream fout = new FileOutputStream("result.ser");
 			ObjectOutputStream oos = new ObjectOutputStream(fout);
@@ -149,6 +143,7 @@ public class Simulator {
 			oos.close();//check if need to close
 		}
 		catch(IOException e){
+			System.out.println(e);
 			System.out.println(e.getMessage());//for testing only!
 		}
 		

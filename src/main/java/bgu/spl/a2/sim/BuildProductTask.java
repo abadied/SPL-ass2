@@ -27,8 +27,9 @@ public class BuildProductTask extends Task<Product>{
 		else {
 			ArrayList<BuildProductTask> tasksArr = new ArrayList<>();
 			for(int i = 0; i < parts.length; i++) {
-				BuildProductTask bpt = new BuildProductTask(new Product(product.getStartId() + 1,parts[i]));
+				BuildProductTask bpt = new BuildProductTask(new Product(product.getStartId() + 1 ,parts[i]));
 				spawn(bpt);
+				bpt.getResult().whenResolved(() -> product.addPart(bpt.getResult().get()));
 				tasksArr.add(bpt);
 			}
 			
@@ -48,8 +49,10 @@ public class BuildProductTask extends Task<Product>{
 			uttList.add(utt);
 			dTool.whenResolved(() -> spawn(utt)); // only once the tool is acquired, spawn the task
 		}
-		
-		whenResolved(uttList, () -> sumIDs()); // once all tool tasks are done, sum all their results
+		if(uttList.size() == 0)
+			complete(product);
+		else
+			whenResolved(uttList, () -> sumIDs()); // once all tool tasks are done, sum all their results
 	}
 	
 	/**
@@ -62,7 +65,6 @@ public class BuildProductTask extends Task<Product>{
 			ID += utt.getResult().get().longValue(); // adding the results from the tools
 		
 		product.setFinalId(ID);
-		
 		complete(product);
 	}
 }

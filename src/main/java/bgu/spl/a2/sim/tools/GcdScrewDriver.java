@@ -3,9 +3,7 @@
  */
 package bgu.spl.a2.sim.tools;
 
-import java.awt.List;
 import java.math.BigInteger;
-import java.util.LinkedList;
 
 import bgu.spl.a2.sim.Product;
 
@@ -22,18 +20,23 @@ public class GcdScrewDriver implements Tool {
 
 	@Override
 	public long useOn(Product p) {
-		//TODO: check!!!
-		int num_of_parts = p.getParts().size();
 		long result = 0;
-		long reverse_id = Long.reverse(p.getStartId() + 1);
-		BigInteger b1 = BigInteger.valueOf(p.getStartId() + 1);
-	    BigInteger b2 = BigInteger.valueOf(reverse_id);
-	    BigInteger gcd = b1.gcd(b2);
-	    for(int i = 0 ; i<num_of_parts; i++){
-			result += gcd.intValue();
+	    for(Product part : p.getParts()){
+			BigInteger b1 = BigInteger.valueOf(part.getFinalId());
+		    BigInteger b2 = BigInteger.valueOf(reverse(part.getFinalId()));
+		    BigInteger gcd = b1.gcd(b2);
+			result += gcd.longValue();
 		}
-	    
 	    return result;
 	}
 
+	public long reverse(long n){
+	    long reverse=0;
+	    while( n != 0 ){
+	        reverse = reverse * 10;
+	        reverse = reverse + n%10;
+	        n = n/10;
+	    }
+	    return reverse;
+	  }
 }
