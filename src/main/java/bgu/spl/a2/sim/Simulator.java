@@ -47,7 +47,7 @@ public class Simulator {
     	for (GsonReader.Zerg[] wave: input.waves) {
 			for (GsonReader.Zerg zerg : wave) {
 				for (int i = 0; i < zerg.qty; i++){
-					BuildProductTask task = new BuildProductTask(new Product(zerg.startId, zerg.product));
+					BuildProductTask task = new BuildProductTask(new Product(zerg.startId + i, zerg.product));
 					pool.submit(task);
 					task.getResult().whenResolved(() -> {
 									products.add(task.getResult().get());
@@ -136,6 +136,13 @@ public class Simulator {
 			e.printStackTrace();
 		}
 		try{
+			
+			//Testing the list output
+			for(Product p : SimulationResult){
+				System.out.println(p.getFinalId());
+			}
+			
+			//writing the result.ser file
 			FileOutputStream fout = new FileOutputStream("result.ser");
 			ObjectOutputStream oos = new ObjectOutputStream(fout);
 			oos.writeObject(SimulationResult);
