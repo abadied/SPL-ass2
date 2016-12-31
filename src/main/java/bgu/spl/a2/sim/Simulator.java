@@ -52,7 +52,7 @@ public class Simulator {
     	for (GsonReader.Zerg[] wave: input.waves) {
 			for (GsonReader.Zerg zerg : wave) {
 				for (int i = 0; i < zerg.qty; i++) {
-					BuildProductTask task = new BuildProductTask(new Product(zerg.startId + i, zerg.product));
+					BuildProductTask task = new BuildProductTask(zerg.startId + i, zerg.product);
 					pool.submit(task);
 					task.getResult().whenResolved(() -> reportFinished()); // counts how many zergs are done
 					dProducts.add(task.getResult()); // save a deferred object for the product
@@ -154,6 +154,7 @@ public class Simulator {
 			System.exit(1);
 		}
 		
+		Warehouse wh = warehouse;
 		////// TODO: remove before sending ///////////////////////////////////////////////////
 		
 		System.out.println("Construction Complete");

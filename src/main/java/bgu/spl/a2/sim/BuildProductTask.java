@@ -13,9 +13,10 @@ public class BuildProductTask extends Task<Product>{
 	
 	Product product;
 	ArrayList<UseToolTask> uttList;
+	ArrayList<Deferred<Product>> dParts;
 	
-	public BuildProductTask(Product product){
-		this.product = product;
+	public BuildProductTask(long StartId, String name){
+		this.product = new Product(StartId, name);
 	}
 	
 	@Override
@@ -23,16 +24,16 @@ public class BuildProductTask extends Task<Product>{
 		// Acquire parts
 		String[]  parts = Simulator.warehouse.getPlan(product.getName()).getParts();
 		
-		if (parts.length == 0) {
+		if (parts.length == 0) { // no parts needed
 			complete(product);
 		}
-		
 		else {
 			ArrayList<BuildProductTask> tasksArr = new ArrayList<>();
+			dParts = new ArrayList<>();
 			for(int i = 0; i < parts.length; i++) {
-				BuildProductTask bpt = new BuildProductTask(new Product(product.getStartId() + 1 ,parts[i]));
+				BuildProductTask bpt = new BuildProductTask(product.getStartId() + 1 ,parts[i]);
 				spawn(bpt);
-				bpt.getResult().whenResolved(() -> product.addPart(bpt.getResult().get()));
+				dParts.add(bpt.getResult());
 				tasksArr.add(bpt);
 			}
 			
@@ -44,7 +45,11 @@ public class BuildProductTask extends Task<Product>{
 	/**
 	 * getting the tools and using them
 	 */
-	private void acquireTools(){
+	private void acquireTools() {
+		
+		for(Deferred<Product> dPart : dParts)
+			product.addPart(dPart.get());
+		
 		uttList = new ArrayList<>();
 		for(String s: Simulator.warehouse.getPlan(product.getName()).getTools()){
 			Deferred<Tool> dTool = Simulator.warehouse.acquireTool(s);
@@ -52,8 +57,10 @@ public class BuildProductTask extends Task<Product>{
 			uttList.add(utt);
 			dTool.whenResolved(() -> spawn(utt)); // only once the tool is acquired, spawn the task
 		}
-		if(uttList.size() == 0)
+		
+		if(uttList.size() == 0) // no tools needed
 			complete(product);
+		
 		else
 			whenResolved(uttList, () -> sumIDs()); // once all tool tasks are done, sum all their results
 	}

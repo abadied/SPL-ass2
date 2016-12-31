@@ -5,10 +5,14 @@ package SerReader;
 
 
 
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-
+import java.io.OutputStreamWriter;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -18,90 +22,73 @@ public class SerReader {
 
 	public static void main(String[] args) {
 		AtomicBoolean flag = new AtomicBoolean(false);
-
-		System.out.println(String.format("%-20s", "----Deserializer----"));
-		System.out.println("SPL171 deserializer for assignment 2");
-		System.out.println();
-		System.out.println();
+		
+		System.out.println("SPL171 deserializer for assignment 2\n\n");
 
 		SerReader obj = new SerReader();
 
-		ConcurrentLinkedQueue<Product> res = obj.deserialzeObject(args[0]);
+		ConcurrentLinkedQueue<Product> res;
+		try {
+			res = obj.deserialzeObject(args[0]);
+		} catch (FileNotFoundException e) {
+			System.err.println("can't find file, check args");
+			throw new RuntimeException();
+		} catch (ClassNotFoundException e) {
+			System.err.println("class not found");
+			throw new RuntimeException();
+		}
 
 		if (res == null) {
 			System.out.println("error -> null object");
-			System.out.println("ser file is corrupted!");
-			System.out.println("final grade is zero  (╯°□°)╯︵ ┻━┻");
 		} else {
-			res.iterator().forEachRemaining((var) -> {
-				flag.set(true);
-				PrintPro(var);
-				System.out.println();
-			});
-		}
-
-		if (flag.get()) {
-			System.out.println("*************************************************************************");
-			System.out.println("*\t\t\tIt seems that you did it right!\t\t\t*");
-			System.out.println("*\tbut we don't take any responsibility on any result! \\_(ʘ_ʘ)_/ \t*");
-			System.out.println("*\t\t\t\tcompare your output!\t\t\t*");
-			System.out.println("*\tCredits:\t\t\t\t\t\t\t*");
-			System.out.println("*\t\t\t\t***M.Zidane***\t\t\t\t*");
-			System.out.println("*\t\t\t\t***M.Sleiman***\t\t\t\t*");
-			System.out.println("*************************************************************************");
+			System.out.println("file read successful\n\n\nWriting into file...");
+			
+			writeToFile(res);
+			System.out.println("done");
 		}
 	}
 
-	public ConcurrentLinkedQueue<Product> deserialzeObject(String filename) {
+	public ConcurrentLinkedQueue<Product> deserialzeObject(String filename) throws FileNotFoundException, ClassNotFoundException{
 
 		ConcurrentLinkedQueue<Product> res = null;
 
-		FileInputStream fin = null;
-		ObjectInputStream ois = null;
-
-		try {
-
-			fin = new FileInputStream(filename);
-			ois = new ObjectInputStream(fin);
+		try (FileInputStream fin = new FileInputStream(filename);
+				ObjectInputStream ois = new ObjectInputStream(fin);) {
 			ConcurrentLinkedQueue<Product> concurrentLinkedQueue = (ConcurrentLinkedQueue<Product>) (ois.readObject());
 			res = concurrentLinkedQueue;
 
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		} finally {
-
-			if (fin != null) {
-				try {
-					fin.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-
-			if (ois != null) {
-				try {
-					ois.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-
+		} catch (IOException e){
+			e.printStackTrace();
 		}
 
 		return res;
 
 	}
+	
+	private static void writeToFile(ConcurrentLinkedQueue<Product> res){
+		File txtfout = new File("readableOutput.txt");
+		
+		try (FileOutputStream fos = new FileOutputStream(txtfout);
+				BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));) {
+			for (Product p : res)
+				addProductToBW(bw, p);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private static void addProductToBW(BufferedWriter bw, Product product) throws IOException{
+		bw.write("ProductName: " + product.getName() + "  Product Id = " + product.getFinalId());
+		bw.newLine();
 
-	private static void PrintPro(Product product) {
-		System.out.println("ProductName: " + product.getName() + "  Product Id = " + product.getFinalId());
-
-		System.out.println("PartsList {");
+		bw.write("PartsList {");
+		bw.newLine();
 		if (product.getParts().size() > 0) {
-			for (int i = 0; i < product.getParts().size(); i++) {
-				PrintPro(product.getParts().get(i));
+			for (Product p : product.getParts()) {
+				addProductToBW(bw, p);
 			}
 		}
-		System.out.println("}");
-
+		bw.write("}");
+		bw.newLine();
 	}
 }

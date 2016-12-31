@@ -24,12 +24,9 @@ import bgu.spl.a2.Deferred;
 public class Warehouse {
 
 	private LinkedList<ManufactoringPlan> plans;
-	private GcdScrewDriver gsd;
-	private NextPrimeHammer nph;
-	private RandomSumPliers rsp;
-	private AtomicInteger gsd_counter;
-	private AtomicInteger nph_counter;
-	private AtomicInteger rsp_counter;
+	private ConcurrentLinkedDeque<GcdScrewDriver> gsDrivers;
+	private ConcurrentLinkedDeque<NextPrimeHammer> npHammers;
+	private ConcurrentLinkedDeque<RandomSumPliers> rsPliers;
 	private ConcurrentLinkedDeque<Deferred<Tool>> gsd_deferreds;
 	private ConcurrentLinkedDeque<Deferred<Tool>> nph_deferreds;
 	private ConcurrentLinkedDeque<Deferred<Tool>> rsp_deferreds;
@@ -39,12 +36,9 @@ public class Warehouse {
 	 */
 	public Warehouse() {
 		plans = new LinkedList<ManufactoringPlan>();
-		gsd = new GcdScrewDriver();
-		nph = new NextPrimeHammer();
-		rsp = new RandomSumPliers();
-		gsd_counter = new AtomicInteger(0);
-		nph_counter = new AtomicInteger(0);
-		rsp_counter = new AtomicInteger(0);
+		gsDrivers = new ConcurrentLinkedDeque<GcdScrewDriver>();
+		npHammers = new ConcurrentLinkedDeque<NextPrimeHammer>();
+		rsPliers = new ConcurrentLinkedDeque<RandomSumPliers>();
 		gsd_deferreds = new ConcurrentLinkedDeque<Deferred<Tool>>();
 		nph_deferreds = new ConcurrentLinkedDeque<Deferred<Tool>>();
 		rsp_deferreds = new ConcurrentLinkedDeque<Deferred<Tool>>();
@@ -61,36 +55,19 @@ public class Warehouse {
 	 */
 	public Deferred<Tool> acquireTool(String type) {
 		Deferred<Tool> d = new Deferred<Tool>();
-		switch(type){
-		case "gs-driver":{
-			if(gsd_counter.get() > 0){
-				d.resolve(gsd);
-				gsd_counter.decrementAndGet();
-			}
-			else	
-				gsd_deferreds.add(d);
-		}
+		switch (type){
+		case "gs-driver":
+			gsd_deferreds.add(d);
 			break;
-		case "np-hammer":{
-			if(nph_counter.get() > 0){
-				d.resolve(nph);
-				nph_counter.decrementAndGet();
-			}
-			else	
-				nph_deferreds.add(d);
-		}
+		case "np-hammer":
+			nph_deferreds.add(d);
 			break;
-		case "rs-pliers": {
-			if(rsp_counter.get() > 0){
-				d.resolve(rsp);
-				rsp_counter.decrementAndGet();
-			}
-			else	
-				rsp_deferreds.add(d);
+		case "rs-pliers": 
+			rsp_deferreds.add(d);
 		}
-			break;
-		default : break;
-		}
+		
+		checkQueue(type);
+		
 		return d;
 	}
 
@@ -102,30 +79,50 @@ public class Warehouse {
 	 *            - The tool to be returned
 	 */
 	public void releaseTool(Tool tool) {
-		// TODO:check
-		this.addTool(tool, 1);
-		switch(tool.getType()){
-		case "gs-driver":{
-			gsd_counter.incrementAndGet();
-			if(!gsd_deferreds.isEmpty())
-				gsd_deferreds.poll().resolve(gsd);
-		}
+		addTool(tool, 1);
+		checkQueue(tool.getType());
+	}
+	
+	private void checkQueue(String type){
+		Deferred<Tool> dTool;
+		switch (type){
+		case "gs-driver":
+			synchronized (gsd_deferreds) {
+				dTool = gsd_deferreds.poll();
+				if (dTool != null) {
+					GcdScrewDriver gsd = gsDrivers.poll();
+					if (gsd != null)
+						dTool.resolve(gsd);
+					else 
+						gsd_deferreds.add(dTool);
+				}
+			}
 			break;
-		case "np-hammer": {
-			nph_counter.incrementAndGet();
-			if(!nph_deferreds.isEmpty())
-				nph_deferreds.poll().resolve(nph);
-		}
+		case "np-hammer":
+			synchronized (nph_deferreds) {
+				dTool = nph_deferreds.poll();
+				if (dTool != null) {
+					NextPrimeHammer nph = npHammers.poll();
+					if (nph != null)
+						dTool.resolve(nph);
+					else 
+						nph_deferreds.add(dTool);
+				}
+			}
 			break;
-		case "rs-pliers": {
-			rsp_counter.incrementAndGet();
-			if(!rsp_deferreds.isEmpty())
-				rsp_deferreds.poll().resolve(rsp);
-		}
+		case "rs-pliers": 
+			synchronized (rsp_deferreds) {
+				dTool = rsp_deferreds.poll();
+				if (dTool != null) {
+					RandomSumPliers rsp = rsPliers.poll();
+					if (rsp != null)
+						dTool.resolve(rsp);
+					else 
+						rsp_deferreds.add(dTool);
+				}
+			}
 			break;
-		default : break;
 		}
-		
 	}
 
 	/**
@@ -137,10 +134,9 @@ public class Warehouse {
 	 * @return A ManufactoringPlan for product
 	 */
 	public ManufactoringPlan getPlan(String product) {
-		for(int i = 0 ; i < plans.size() ; i++){
-			if(plans.get(i).getProductName().equals(product))
+		for (int i = 0 ; i < plans.size() ; i++){
+			if (plans.get(i).getProductName().equals(product))
 				return plans.get(i);
-				
 		}
 		return null; // if none found
 	}
@@ -152,9 +148,7 @@ public class Warehouse {
 	 *            - a ManufactoringPlan to be stored
 	 */
 	public void addPlan(ManufactoringPlan plan) {
-		// TODO:check
 		plans.addLast(plan);
-
 	}
 
 	/**
@@ -167,18 +161,17 @@ public class Warehouse {
 	 *            - amount of tools of type tool to be stored
 	 */
 	public void addTool(Tool tool, int qty) {
-		// TODO:check
-		switch(tool.getType()){
-		case "gs-driver": gsd_counter.addAndGet(qty);
+		switch (tool.getType()){
+		case "gs-driver":
+			gsDrivers.add((GcdScrewDriver)tool);
 			break;
-		case "np-hammer": nph_counter.addAndGet(qty);
+		case "np-hammer":
+			npHammers.add((NextPrimeHammer)tool);
 			break;
-		case "rs-pliers": rsp_counter.addAndGet(qty);
+		case "rs-pliers":
+			rsPliers.add((RandomSumPliers)tool);
 			break;
-		default : break;
 		}
 	}
-	
-
 
 }
