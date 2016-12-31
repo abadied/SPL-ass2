@@ -67,13 +67,14 @@ public class Simulator {
 			}
 		}
     	
+    	System.out.println("done");
+    	
     	return products;
     }
     
     private static void reportFinished(){
     	synchronized (lock) {
     		finished.incrementAndGet();
-    		System.out.println("finished: " + finished.get());
     		lock.notify();
 		}
     }
@@ -143,8 +144,7 @@ public class Simulator {
 			oos.close();//check if need to close
 		}
 		catch(IOException e){
-			System.out.println(e);
-			System.out.println(e.getMessage());//for testing only!
+			e.printStackTrace();
 		}
 		
 		
