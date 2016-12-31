@@ -6,15 +6,21 @@
 package bgu.spl.a2.sim;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.io.OutputStreamWriter;
+import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.google.gson.Gson;
 
+import bgu.spl.a2.Deferred;
 import bgu.spl.a2.WorkStealingThreadPool;
 import bgu.spl.a2.sim.conf.ManufactoringPlan;
 import bgu.spl.a2.sim.tools.GcdScrewDriver;
@@ -41,7 +47,7 @@ public class Simulator {
     public static ConcurrentLinkedQueue<Product> start(){
     	lock = new Object();
     	pool.start();
-    	ConcurrentLinkedQueue<Product> products = new ConcurrentLinkedQueue<>();
+    	LinkedList<Deferred<Product>> dProducts = new LinkedList<>();
     	int qty = 0;
     	finished = new AtomicInteger(0);
     	for (GsonReader.Zerg[] wave: input.waves) {
@@ -49,10 +55,8 @@ public class Simulator {
 				for (int i = 0; i < zerg.qty; i++){
 					BuildProductTask task = new BuildProductTask(new Product(zerg.startId + i, zerg.product));
 					pool.submit(task);
-					task.getResult().whenResolved(() -> {
-									products.add(task.getResult().get());
-									reportFinished();
-								});
+					task.getResult().whenResolved(() -> reportFinished());
+					dProducts.add(task.getResult());
 					qty++;
 				}
 			}
@@ -68,6 +72,10 @@ public class Simulator {
 		}
     	
     	System.out.println("done");
+    	
+    	ConcurrentLinkedQueue<Product> products = new ConcurrentLinkedQueue<>();
+    	for(Deferred<Product> dProd : dProducts)
+    		products.add(dProd.get());
     	
     	return products;
     }
@@ -136,6 +144,23 @@ public class Simulator {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+		
+		////// TODO: remove before sending ///////////////////////////////////////////////////
+		
+		File txtfout = new File("out.txt");
+		
+		try (	FileOutputStream fos = new FileOutputStream(txtfout);
+				BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
+				){
+			for (Product p : SimulationResult) {
+				bw.write(p.getFinalId() + "");
+				bw.newLine();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		/////////////////////////////////////////////////////////////////////////////////////
+		
 		try{
 			//writing the result.ser file
 			FileOutputStream fout = new FileOutputStream("result.ser");
