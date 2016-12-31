@@ -13,10 +13,8 @@ public class GcdScrewDriver implements Tool {
 
 	@Override
 	public String getType() {
-		//TODO:check if anything else needed in this function
 		return new String("gs-driver");
 	}
-
 
 	@Override
 	public long useOn(Product p) {
@@ -30,13 +28,18 @@ public class GcdScrewDriver implements Tool {
 	    return result;
 	}
 
-	public long reverse(long n){
-	    long reverse=0;
-	    while( n != 0 ){
-	        reverse = reverse * 10;
-	        reverse = reverse + n%10;
-	        n = n/10;
+	/**
+	 * reverses the given number (base 10)
+	 * @param n a number to reverse
+	 * @return reversed number
+	 */
+	private long reverse(long n){
+	    long reversed=0;
+	    while(n != 0){
+	        reversed = reversed * 10;
+	        reversed = reversed + (n % 10);
+	        n = n / 10;
 	    }
-	    return reverse;
+	    return reversed;
 	  }
 }

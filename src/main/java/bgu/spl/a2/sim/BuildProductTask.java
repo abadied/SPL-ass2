@@ -6,6 +6,9 @@ import bgu.spl.a2.Deferred;
 import bgu.spl.a2.Task;
 import bgu.spl.a2.sim.tools.Tool;
 
+/**
+ * A task to construct the product from it's parts
+ */
 public class BuildProductTask extends Task<Product>{
 	
 	Product product;

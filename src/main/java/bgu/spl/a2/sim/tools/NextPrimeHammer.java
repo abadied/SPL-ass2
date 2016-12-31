@@ -12,13 +12,9 @@ public class NextPrimeHammer implements Tool {
 
 	@Override
 	public String getType() {
-		//TODO:check if anything else needed in this function
 		return new String("np-hammer");
 	}
 
-
-	
-	
 	@Override
 	public long useOn(Product p) {
 		

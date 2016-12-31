@@ -10,7 +10,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
@@ -52,38 +51,48 @@ public class Simulator {
     	finished = new AtomicInteger(0);
     	for (GsonReader.Zerg[] wave: input.waves) {
 			for (GsonReader.Zerg zerg : wave) {
-				for (int i = 0; i < zerg.qty; i++){
+				for (int i = 0; i < zerg.qty; i++) {
 					BuildProductTask task = new BuildProductTask(new Product(zerg.startId + i, zerg.product));
 					pool.submit(task);
-					task.getResult().whenResolved(() -> reportFinished());
-					dProducts.add(task.getResult());
+					task.getResult().whenResolved(() -> reportFinished()); // counts how many zergs are done
+					dProducts.add(task.getResult()); // save a deferred object for the product
 					qty++;
 				}
 			}
-			synchronized(lock) {
-				try {
-					while(finished.get() < qty)
-						lock.wait();
-				} catch (InterruptedException e){
-					System.out.println("interrupted");
-					System.exit(1);
-				}
-			}
+			waitForWave(qty);
 		}
     	
-    	System.out.println("done");
-    	
+    	// collect the deferred to a queue of products
     	ConcurrentLinkedQueue<Product> products = new ConcurrentLinkedQueue<>();
-    	for(Deferred<Product> dProd : dProducts)
+    	for(Deferred<Product> dProd : dProducts) 
     		products.add(dProd.get());
     	
     	return products;
     }
     
-    private static void reportFinished(){
+    /**
+     * handles the counting of finished zergs and notifies the main function 
+     */
+    private static void reportFinished() {
     	synchronized (lock) {
     		finished.incrementAndGet();
     		lock.notify();
+		}
+    }
+    
+    /**
+     * waits for the wave to finish
+     * @param qty expected number of zergs
+     */
+    private static void waitForWave(int qty) {
+    	synchronized(lock) {
+			try {
+				while(finished.get() < qty)
+					lock.wait();
+			} catch (InterruptedException e){
+				System.out.println("interrupted");
+				System.exit(1);
+			}
 		}
     }
     
@@ -102,9 +111,9 @@ public class Simulator {
 		input = null;
 		try (BufferedReader br = new BufferedReader(new FileReader(args[0]));){
 			input = gson.fromJson(br, GsonReader.class);
-			System.out.println("file read");
 		} catch (IOException e) {
-			System.out.println("failed to read file");
+			e.printStackTrace();
+			System.exit(1);
 		}
 		
 		if (input == null) {
@@ -135,23 +144,25 @@ public class Simulator {
 		for (GsonReader.Plan plan: input.plans)
 			warehouse.addPlan(new ManufactoringPlan(plan.product, plan.parts, plan.tools));
 		
-		//write the result file
-		ConcurrentLinkedQueue<Product> SimulationResult;
-		SimulationResult = Simulator.start();
+		//// start the simulator
+		ConcurrentLinkedQueue<Product> SimulationResult = Simulator.start();
 		
 		try {
 			pool.shutdown();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
+			System.exit(1);
 		}
 		
 		////// TODO: remove before sending ///////////////////////////////////////////////////
 		
+		System.out.println("Construction Complete");
+		System.out.println("Creating txt file -------- dont forget to remove this");
+		
 		File txtfout = new File("out.txt");
 		
-		try (	FileOutputStream fos = new FileOutputStream(txtfout);
-				BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
-				){
+		try (FileOutputStream fos = new FileOutputStream(txtfout);
+				BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));) {
 			for (Product p : SimulationResult) {
 				bw.write(p.getFinalId() + "");
 				bw.newLine();
@@ -161,17 +172,15 @@ public class Simulator {
 		}
 		/////////////////////////////////////////////////////////////////////////////////////
 		
-		try{
-			//writing the result.ser file
-			FileOutputStream fout = new FileOutputStream("result.ser");
-			ObjectOutputStream oos = new ObjectOutputStream(fout);
+		
+		//// write the result.ser file
+		try (FileOutputStream fout = new FileOutputStream("result.ser");
+				ObjectOutputStream oos = new ObjectOutputStream(fout);) {
 			oos.writeObject(SimulationResult);
-			oos.close();//check if need to close
 		}
 		catch(IOException e){
 			e.printStackTrace();
 		}
-		
-		
+				
 	}
 }
