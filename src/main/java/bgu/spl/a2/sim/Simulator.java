@@ -6,13 +6,10 @@
 package bgu.spl.a2.sim;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.io.OutputStreamWriter;
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -154,30 +151,6 @@ public class Simulator {
 			e.printStackTrace();
 			System.exit(1);
 		}
-		
-		
-		////// TODO: remove before sending ///////////////////////////////////////////////////
-		
-		Warehouse wh = warehouse;
-		System.out.println("deferred waiting for resolve: " + (wh.gsd_deferreds.size() + wh.nph_deferreds.size() + wh.rsp_deferreds.size()));
-		System.out.println("tools avaiable: " + (wh.gsDrivers.size() + " gsd, " + wh.npHammers.size() + " nph, " + wh.rsPliers.size() + " rsp"));
-		
-		System.out.println("\nConstruction Complete");
-		System.out.println("Creating txt file -------- dont forget to remove this");
-		
-		File txtfout = new File("out.txt");
-		
-		try (FileOutputStream fos = new FileOutputStream(txtfout);
-				BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));) {
-			for (Product p : SimulationResult) {
-				bw.write(p.getFinalId() + "");
-				bw.newLine();
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		/////////////////////////////////////////////////////////////////////////////////////
-		
 		
 		//// write the result.ser file
 		try (FileOutputStream fout = new FileOutputStream("result.ser");
