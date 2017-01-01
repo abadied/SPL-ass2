@@ -19,11 +19,13 @@ public class NextPrimeHammer implements Tool {
 	public long useOn(Product p) {
 		
 		long result = 0;
-		BigInteger prime;
+		long prime;
 		for(Product part : p.getParts()){
-			BigInteger b = new BigInteger(String.valueOf(part.getFinalId()));
-			prime = b.nextProbablePrime();
-			result += prime.longValue();
+			BigInteger b = BigInteger.valueOf(part.getFinalId());
+			prime = b.nextProbablePrime().longValue();
+			if (prime < 2)
+				prime = 2;
+			result += prime;
 		}
         return result;
 	}
