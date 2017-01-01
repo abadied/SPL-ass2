@@ -1,9 +1,11 @@
-package bgu.spl.a2.sim;
+package bgu.spl.a2.sim.tasks;
 
 import java.util.ArrayList;
 
 import bgu.spl.a2.Deferred;
 import bgu.spl.a2.Task;
+import bgu.spl.a2.sim.Product;
+import bgu.spl.a2.sim.Warehouse;
 import bgu.spl.a2.sim.tools.Tool;
 
 /**
@@ -14,15 +16,17 @@ public class BuildProductTask extends Task<Product>{
 	Product product;
 	ArrayList<UseToolTask> uttList;
 	ArrayList<Deferred<Product>> dParts;
+	Warehouse warehouse;
 	
-	public BuildProductTask(long StartId, String name){
+	public BuildProductTask(long StartId, String name, Warehouse warehouse){
 		this.product = new Product(StartId, name);
+		this.warehouse = warehouse;
 	}
 	
 	@Override
 	protected void start() {
 		// Acquire parts
-		String[]  parts = Simulator.warehouse.getPlan(product.getName()).getParts();
+		String[]  parts = warehouse.getPlan(product.getName()).getParts();
 		
 		if (parts.length == 0) { // no parts needed
 			complete(product);
@@ -31,7 +35,7 @@ public class BuildProductTask extends Task<Product>{
 			ArrayList<BuildProductTask> tasksArr = new ArrayList<>();
 			dParts = new ArrayList<>();
 			for(int i = 0; i < parts.length; i++) {
-				BuildProductTask bpt = new BuildProductTask(product.getStartId() + 1 ,parts[i]);
+				BuildProductTask bpt = new BuildProductTask(product.getStartId() + 1 ,parts[i], warehouse);
 				spawn(bpt);
 				dParts.add(bpt.getResult());
 				tasksArr.add(bpt);
@@ -51,9 +55,9 @@ public class BuildProductTask extends Task<Product>{
 			product.addPart(dPart.get());
 		
 		uttList = new ArrayList<>();
-		for(String s: Simulator.warehouse.getPlan(product.getName()).getTools()){
-			Deferred<Tool> dTool = Simulator.warehouse.acquireTool(s);
-			UseToolTask utt = new UseToolTask(product, dTool);
+		for(String s: warehouse.getPlan(product.getName()).getTools()){
+			Deferred<Tool> dTool = warehouse.acquireTool(s);
+			UseToolTask utt = new UseToolTask(product, dTool, warehouse);
 			uttList.add(utt);
 			dTool.whenResolved(() -> spawn(utt)); // only once the tool is acquired, spawn the task
 		}

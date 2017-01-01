@@ -8,7 +8,6 @@ import bgu.spl.a2.sim.conf.ManufactoringPlan;
 
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import bgu.spl.a2.Deferred;
 
@@ -23,13 +22,13 @@ import bgu.spl.a2.Deferred;
  */
 public class Warehouse {
 
-	private LinkedList<ManufactoringPlan> plans;
-	private ConcurrentLinkedDeque<GcdScrewDriver> gsDrivers;
-	private ConcurrentLinkedDeque<NextPrimeHammer> npHammers;
-	private ConcurrentLinkedDeque<RandomSumPliers> rsPliers;
-	private ConcurrentLinkedDeque<Deferred<Tool>> gsd_deferreds;
-	private ConcurrentLinkedDeque<Deferred<Tool>> nph_deferreds;
-	private ConcurrentLinkedDeque<Deferred<Tool>> rsp_deferreds;
+	LinkedList<ManufactoringPlan> plans;
+	ConcurrentLinkedDeque<GcdScrewDriver> gsDrivers;
+	ConcurrentLinkedDeque<NextPrimeHammer> npHammers;
+	ConcurrentLinkedDeque<RandomSumPliers> rsPliers;
+	ConcurrentLinkedDeque<Deferred<Tool>> gsd_deferreds;
+	ConcurrentLinkedDeque<Deferred<Tool>> nph_deferreds;
+	ConcurrentLinkedDeque<Deferred<Tool>> rsp_deferreds;
 
 	/**
 	 * Constructor
@@ -163,13 +162,16 @@ public class Warehouse {
 	public void addTool(Tool tool, int qty) {
 		switch (tool.getType()){
 		case "gs-driver":
-			gsDrivers.add((GcdScrewDriver)tool);
+			for (int i = 0; i < qty; i++)
+				gsDrivers.add(new GcdScrewDriver());
 			break;
 		case "np-hammer":
-			npHammers.add((NextPrimeHammer)tool);
+			for (int i = 0; i < qty; i++)
+				npHammers.add(new NextPrimeHammer());
 			break;
 		case "rs-pliers":
-			rsPliers.add((RandomSumPliers)tool);
+			for (int i = 0; i < qty; i++)
+				rsPliers.add(new RandomSumPliers());
 			break;
 		}
 	}

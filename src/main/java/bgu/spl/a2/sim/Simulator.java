@@ -22,6 +22,7 @@ import com.google.gson.Gson;
 import bgu.spl.a2.Deferred;
 import bgu.spl.a2.WorkStealingThreadPool;
 import bgu.spl.a2.sim.conf.ManufactoringPlan;
+import bgu.spl.a2.sim.tasks.BuildProductTask;
 import bgu.spl.a2.sim.tools.GcdScrewDriver;
 import bgu.spl.a2.sim.tools.NextPrimeHammer;
 import bgu.spl.a2.sim.tools.RandomSumPliers;
@@ -52,7 +53,7 @@ public class Simulator {
     	for (GsonReader.Zerg[] wave: input.waves) {
 			for (GsonReader.Zerg zerg : wave) {
 				for (int i = 0; i < zerg.qty; i++) {
-					BuildProductTask task = new BuildProductTask(zerg.startId + i, zerg.product);
+					BuildProductTask task = new BuildProductTask(zerg.startId + i, zerg.product, warehouse);
 					pool.submit(task);
 					task.getResult().whenResolved(() -> reportFinished()); // counts how many zergs are done
 					dProducts.add(task.getResult()); // save a deferred object for the product
@@ -154,10 +155,14 @@ public class Simulator {
 			System.exit(1);
 		}
 		
-		Warehouse wh = warehouse;
+		
 		////// TODO: remove before sending ///////////////////////////////////////////////////
 		
-		System.out.println("Construction Complete");
+		Warehouse wh = warehouse;
+		System.out.println("deferred waiting for resolve: " + (wh.gsd_deferreds.size() + wh.nph_deferreds.size() + wh.rsp_deferreds.size()));
+		System.out.println("tools avaiable: " + (wh.gsDrivers.size() + " gsd, " + wh.npHammers.size() + " nph, " + wh.rsPliers.size() + " rsp"));
+		
+		System.out.println("\nConstruction Complete");
 		System.out.println("Creating txt file -------- dont forget to remove this");
 		
 		File txtfout = new File("out.txt");

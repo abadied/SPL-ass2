@@ -1,7 +1,9 @@
-package bgu.spl.a2.sim;
+package bgu.spl.a2.sim.tasks;
 
 import bgu.spl.a2.Deferred;
 import bgu.spl.a2.Task;
+import bgu.spl.a2.sim.Product;
+import bgu.spl.a2.sim.Warehouse;
 import bgu.spl.a2.sim.tools.Tool;
 
 /**
@@ -13,6 +15,7 @@ public class UseToolTask extends Task<Long>{
 	
 	Product product;
 	Deferred<Tool> dTool;
+	Warehouse warehouse;
 	
 	/**
 	 * Constructor
@@ -20,9 +23,10 @@ public class UseToolTask extends Task<Long>{
 	 * @param product the product that requires work
 	 * @param dTool the tool to work on the given product
 	 */
-	public UseToolTask(Product product, Deferred<Tool> dTool){
+	public UseToolTask(Product product, Deferred<Tool> dTool, Warehouse warehouse){
 		this.product = product;
 		this.dTool = dTool;
+		this.warehouse = warehouse;
 	}
 	
 	
@@ -33,6 +37,6 @@ public class UseToolTask extends Task<Long>{
 	@Override
 	protected void start() {
 		complete(dTool.get().useOn(product));
-		Simulator.warehouse.releaseTool(dTool.get());
+		warehouse.releaseTool(dTool.get());
 	}
 }
