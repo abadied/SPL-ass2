@@ -22,13 +22,13 @@ import bgu.spl.a2.Deferred;
  */
 public class Warehouse {
 
-	LinkedList<ManufactoringPlan> plans;
-	ConcurrentLinkedDeque<GcdScrewDriver> gsDrivers;
-	ConcurrentLinkedDeque<NextPrimeHammer> npHammers;
-	ConcurrentLinkedDeque<RandomSumPliers> rsPliers;
-	ConcurrentLinkedDeque<Deferred<Tool>> gsd_deferreds;
-	ConcurrentLinkedDeque<Deferred<Tool>> nph_deferreds;
-	ConcurrentLinkedDeque<Deferred<Tool>> rsp_deferreds;
+	private LinkedList<ManufactoringPlan> plans;
+	private ConcurrentLinkedDeque<GcdScrewDriver> gsDrivers;
+	private ConcurrentLinkedDeque<NextPrimeHammer> npHammers;
+	private ConcurrentLinkedDeque<RandomSumPliers> rsPliers;
+	private ConcurrentLinkedDeque<Deferred<Tool>> gsd_deferreds;
+	private ConcurrentLinkedDeque<Deferred<Tool>> nph_deferreds;
+	private ConcurrentLinkedDeque<Deferred<Tool>> rsp_deferreds;
 
 	/**
 	 * Constructor
@@ -65,7 +65,7 @@ public class Warehouse {
 			rsp_deferreds.add(d);
 		}
 		
-		checkQueue(type);
+		checkQueue(type); // try to check for tools right when a task asks for it
 		
 		return d;
 	}

@@ -9,6 +9,7 @@ import bgu.spl.a2.Task;
 import bgu.spl.a2.WorkStealingThreadPool;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 
@@ -74,45 +75,23 @@ public class MergeSort extends Task<int[]> {
 
 	
 	public static void main(String[] args) throws InterruptedException {
-		
-		int counter = 0;
-		for(int k = 0 ; k<5 ; k++){
-			WorkStealingThreadPool pool = new WorkStealingThreadPool(10);
-			int n = 1_000_000; // you may check on different number of elements if you
-								// like
-			int[] array = new Random().ints(n).toArray();
-			
-			MergeSort task = new MergeSort(array);
-			CountDownLatch l = new CountDownLatch(1);
-			pool.start();
-			pool.submit(task);
-			task.getResult().whenResolved(() -> {
-				// warning - a large print!! - you can remove this line if you wish
-				//System.out.println(Arrays.toString(task.getResult().get()));
-				l.countDown();
-			});
-			
-			l.await();
-			
-			pool.shutdown();
-			
-			int[] arr = task.getResult().get();
-			
-			//checks if the array is really sorted
-			for (int i = 0; i < arr.length; i++) {
-				if (i == arr.length - 1){
-				//	System.out.println("GOOD!");
-				}
-				else if (arr[i] > arr[i+1]){
-				//	System.out.println("BAD! you failed!");
-					counter++;
-					break;
-				}
-			}
-			
-			
-		}
-		System.out.println("number of errors:" + counter);
-	}
+        WorkStealingThreadPool pool = new WorkStealingThreadPool(4);
+        int n = 1000000; //you may check on different number of elements if you like
+        int[] array = new Random().ints(n).toArray();
+
+        MergeSort task = new MergeSort(array);
+
+        CountDownLatch l = new CountDownLatch(1);
+        pool.start();
+        pool.submit(task);
+        task.getResult().whenResolved(() -> {
+            //warning - a large print!! - you can remove this line if you wish
+            System.out.println(Arrays.toString(task.getResult().get()));
+            l.countDown();
+        });
+
+        l.await();
+        pool.shutdown();
+    }
 
 }
