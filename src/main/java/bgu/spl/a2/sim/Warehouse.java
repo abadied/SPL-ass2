@@ -41,7 +41,6 @@ public class Warehouse {
 		gsd_deferreds = new ConcurrentLinkedDeque<Deferred<Tool>>();
 		nph_deferreds = new ConcurrentLinkedDeque<Deferred<Tool>>();
 		rsp_deferreds = new ConcurrentLinkedDeque<Deferred<Tool>>();
-		
 	}
 
 	/**
@@ -82,6 +81,13 @@ public class Warehouse {
 		checkQueue(tool.getType());
 	}
 	
+	/**
+	 * checks the request queue of a specific type, and resolve it with a tool if there's one available
+	 * 
+	 * we synchronize the pulling from the queue because if we don't have a tool we need to add it back before the next check
+	 * 
+	 * @param type the type of tool to check
+	 */
 	private void checkQueue(String type){
 		Deferred<Tool> dTool;
 		switch (type){

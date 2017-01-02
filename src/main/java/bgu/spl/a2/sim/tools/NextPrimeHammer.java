@@ -17,7 +17,6 @@ public class NextPrimeHammer implements Tool {
 
 	@Override
 	public long useOn(Product p) {
-		
 		long result = 0;
 		long prime;
 		for(Product part : p.getParts()){
